@@ -1,0 +1,4 @@
+venv/
+__pycache__/
+.idea/
+make_shopping_easier/local_settings.py
