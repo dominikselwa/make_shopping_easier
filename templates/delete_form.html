@@ -1,0 +1,13 @@
+<div class="card-header">
+    Chcesz usunąć {{ model_name }} {{ object.name }}?
+</div>
+<div class="card-body">
+    <form method="post" class>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="text-center">
+            <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-success">Cofnij</a>
+            <button type="submit" class="btn btn-danger">Usuń</button>
+        </div>
+    </form>
+</div>

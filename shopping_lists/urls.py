@@ -20,4 +20,12 @@ from shopping_lists import views
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
     path('signup/', views.SingUpView.as_view(), name='signup'),
+    path('main/', views.MainView.as_view(), name='main'),
+
+    path('spaces/', views.SpaceListView.as_view(), name='space_list'),
+    path('spaces/new/', views.SpaceCreateView.as_view(), name='space_new'),
+    path('spaces/<int:pk>/', views.SpaceDetailView.as_view(), name='space_detail'),
+    path('spaces/<int:pk>/edit/', views.SpaceEditView.as_view(), name='space_edit'),
+    path('spaces/<int:pk>/delete/', views.SpaceDeleteView.as_view(), name='space_delete'),
+
 ]

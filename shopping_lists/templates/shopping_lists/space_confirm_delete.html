@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    Zaloguj
+    Usuń przestrzeń {{ object.name }}
 {% endblock %}
 
 {% block content %}
     <div class="card mx-auto mt-5 mb-5" style="width: 18rem">
-        {% include 'form.html' with button_name='Zaloguj' %}
+        {% include 'delete_form.html' with model_name='przestrzeń' %}
     </div>
 {% endblock %}

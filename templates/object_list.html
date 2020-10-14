@@ -1,0 +1,16 @@
+<div class="card-body">
+    <ul class="list-group list-group-flush">
+        {% for object in object_list %}
+            <li class="list-group-item">
+                <div class="d-flex justify-content-between">
+                    <a href="{{ object.get_detail_url }}">{{ object }}</a>
+
+                <div>
+                    <a class="btn btn-primary" href="{{ object.get_edit_url }}">Edytuj</a>
+                    <a class="btn btn-danger" href="{{ object.get_delete_url }}">Usuń</a>
+                </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</div>

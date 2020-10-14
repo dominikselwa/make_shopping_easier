@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Nowa przestrzeń
+{% endblock %}
+
+{% block content %}
+    <div class="card mx-auto mt-5 mb-5" style="width: 36rem">
+    <div class="card-header">Twoje przestrzenie:</div>
+        {% include 'object_list.html' %}
+    </div>
+{% endblock %}

@@ -1,12 +1,25 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-
 # Create your models here.
+from django.urls import reverse
+
 
 class Space(models.Model):
     name = models.CharField(max_length=32)
     users = models.ManyToManyField(User)
+
+    def __str__(self):
+        return self.name
+
+    def get_detail_url(self):
+        return reverse('space_detail', kwargs={'pk': self.id})
+
+    def get_edit_url(self):
+        return reverse('space_edit', kwargs={'pk': self.id})
+
+    def get_delete_url(self):
+        return reverse('space_delete', kwargs={'pk': self.id})
 
 
 class Fridge(models.Model):

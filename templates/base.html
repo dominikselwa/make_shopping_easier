@@ -19,12 +19,25 @@
         </button>
         <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Features</a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Pricing</a>
-                </li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Przestrzenie
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{% url 'space_list' %}">Przestrzenie</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'space_new' %}">Dodaj przestrzeń</a>
+                        </div>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/fridges/">Lodówki</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/shopping-lists/">Listy zakupów</a>
+                    </li>
+                {% endif %}
             </ul>
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
@@ -43,7 +56,7 @@
         </div>
     </div>
 </nav>
-<div class="container-xl mt-5 mb-5 content">
+<div class="container-xl content">
     {% block content %}
         Witaj w najlepszej aplikacji do łatwego tworzenia list na zakupy
     {% endblock %}
