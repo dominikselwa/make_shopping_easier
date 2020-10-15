@@ -77,6 +77,10 @@ class ShoppingList(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=32)
+    space = models.ForeignKey(Space, on_delete=models.CASCADE, related_name='categories')
+
+    class Meta:
+        unique_together = ('name', 'space')
 
 
 class Product(models.Model):

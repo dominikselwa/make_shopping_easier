@@ -48,3 +48,22 @@ class ShoppingListForm(forms.Form):
                 raise ValidationError('Nie można dodać kolejnej listy zakupów o takiej nazwie')
             cleaned_data['fridge'] = fridge
             return cleaned_data
+
+
+class CategoryForm(forms.Form):
+    name = forms.CharField(max_length=32, label='Nazwa kategorii')
+
+    def __init__(self, *args, **kwargs):
+        self.space_id = kwargs.pop('space_id', None)
+        self.category_id = kwargs.pop('category_id', None)
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get('name')
+        if name is not None:
+            space = Space.objects.get(pk=self.space_id)
+            if space.categories.filter(name=name).exclude(id=self.category_id).count() > 0:
+                raise ValidationError('Nie można dodać kolejnej kategorii o takiej nazwie')
+            cleaned_data['space'] = space
+            return cleaned_data

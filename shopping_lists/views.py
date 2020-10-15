@@ -1,8 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import OperationalError
-from django.http import HttpResponseForbidden, Http404
+from django.http import Http404
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -10,8 +9,8 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, ListView, DetailView, DeleteView
 
-from shopping_lists.forms import SpaceModelForm, FridgeForm, ShoppingListForm
-from shopping_lists.models import Space, Fridge, ShoppingList
+from shopping_lists.forms import SpaceModelForm, FridgeForm, ShoppingListForm, CategoryForm
+from shopping_lists.models import Space, Fridge, ShoppingList, Category
 
 
 class UserIsInSpacePkMixin(UserPassesTestMixin):
@@ -103,7 +102,6 @@ class SpaceDeleteView(UserIsInSpacePkMixin, DeleteView):
 class FridgeCreationView(UserIsInSpacePkMixin, CreateView):
     def get(self, request, pk):
         form = FridgeForm(space_id=pk)
-        form.space = pk
         return render(request, 'shopping_lists/space.html', {'form': form})
 
     def post(self, request, pk):
@@ -150,7 +148,6 @@ class FridgeDeleteView(UserIsInSpaceIdMixin, DeleteView):
 class ShoppingListCreationView(UserIsInSpaceIdMixin, CreateView):
     def get(self, request, space_id, pk):
         form = ShoppingListForm(fridge_id=pk)
-        form.space = space_id
         return render(request, 'shopping_lists/space.html', {'form': form})
 
     def post(self, request, space_id, pk):
@@ -198,3 +195,20 @@ class ShoppingListDeleteView(UserIsInSpaceIdMixin, DeleteView):
     model = ShoppingList
     success_url = reverse_lazy('space_list')
     template_name = 'delete_form.html'
+
+class CategoryCreationView(UserIsInSpacePkMixin, View):
+    def get(self, request, pk):
+        form = CategoryForm(space_id=pk)
+        return render(request, 'shopping_lists/space.html', {'form': form})
+
+    def post(self, request, pk):
+        form = CategoryForm(request.POST, space_id=pk)
+        if form.is_valid():
+            Category.objects.create(**form.cleaned_data)
+            return redirect('space_detail', pk=pk)
+        return render(request, 'shopping_lists/space.html', {'form': form})
+
+# class CategoryEditView(UserIsInSpaceIdMixin, View):
+# class CategoryDeleteView(UserIsInSpaceIdMixin, DeleteView):
+
+
