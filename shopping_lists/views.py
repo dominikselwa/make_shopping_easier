@@ -10,33 +10,13 @@ from django.views import View
 from django.views.generic import CreateView, ListView, DetailView, DeleteView
 
 from shopping_lists.forms import SpaceModelForm, FridgeForm, ShoppingListForm, CategoryForm
+from shopping_lists.mixins import UserIsInSpaceMixin
 from shopping_lists.models import Space, Fridge, ShoppingList, Category
-
-
-class UserIsInSpacePkMixin(UserPassesTestMixin):
-    def test_func(self):
-        if self.kwargs.get('pk') is not None:
-            try:
-                return self.request.user in Space.objects.get(pk=self.kwargs['pk']).users.all()
-            except ObjectDoesNotExist:
-                raise Http404
-
-
-class UserIsInSpaceIdMixin(UserPassesTestMixin):
-    def test_func(self):
-        if self.kwargs.get('space_id') is not None:
-            try:
-                return self.request.user in Space.objects.get(pk=self.kwargs['space_id']).users.all()
-            except ObjectDoesNotExist:
-                raise Http404
-
 
 
 class IndexView(View):
     def get(self, request):
         return render(request, 'base.html')
-
-
 
 
 class SingUpView(CreateView):
@@ -65,7 +45,7 @@ class SpaceCreateView(LoginRequiredMixin, CreateView):
         return render(request, 'shopping_lists/space.html', {'form': form})
 
 
-class SpaceEditView(UserIsInSpacePkMixin, View):
+class SpaceEditView(UserIsInSpaceMixin, View):
 
     def get(self, request, pk):
         space = Space.objects.get(id=pk)
@@ -89,17 +69,17 @@ class SpaceListView(LoginRequiredMixin, ListView):
         return Space.objects.filter(users=self.request.user)
 
 
-class SpaceDetailView(UserIsInSpacePkMixin, DetailView):
+class SpaceDetailView(UserIsInSpaceMixin, DetailView):
     model = Space
 
 
-class SpaceDeleteView(UserIsInSpacePkMixin, DeleteView):
+class SpaceDeleteView(UserIsInSpaceMixin, DeleteView):
     model = Space
     success_url = reverse_lazy('space_list')
     template_name = 'delete_form.html'
 
 
-class FridgeCreationView(UserIsInSpacePkMixin, CreateView):
+class FridgeCreationView(UserIsInSpaceMixin, CreateView):
     def get(self, request, pk):
         form = FridgeForm(space_id=pk)
         return render(request, 'shopping_lists/space.html', {'form': form})
@@ -112,7 +92,7 @@ class FridgeCreationView(UserIsInSpacePkMixin, CreateView):
         return render(request, 'shopping_lists/space.html', {'form': form})
 
 
-class FridgeEditView(UserIsInSpaceIdMixin, View):
+class FridgeEditView(UserIsInSpaceMixin, View):
     def get(self, request, pk, space_id):
         fridge = Fridge.objects.get(id=pk)
         form = FridgeForm(initial={'name': fridge.name})
@@ -128,24 +108,24 @@ class FridgeEditView(UserIsInSpaceIdMixin, View):
         return render(request, 'shopping_lists/space.html', {'form': form})
 
 
-class FridgeListView(UserIsInSpacePkMixin, ListView):
+class FridgeListView(UserIsInSpaceMixin, ListView):
     model = Fridge
 
     def get_queryset(self):
         return Fridge.objects.filter(space=Space.objects.get(pk=self.kwargs['pk']))
 
 
-class FridgeDetailView(UserIsInSpaceIdMixin, DetailView):
+class FridgeDetailView(UserIsInSpaceMixin, DetailView):
     model = Fridge
 
 
-class FridgeDeleteView(UserIsInSpaceIdMixin, DeleteView):
+class FridgeDeleteView(UserIsInSpaceMixin, DeleteView):
     model = Fridge
     success_url = reverse_lazy('space_list')
     template_name = 'delete_form.html'
 
 
-class ShoppingListCreationView(UserIsInSpaceIdMixin, CreateView):
+class ShoppingListCreationView(UserIsInSpaceMixin, CreateView):
     def get(self, request, space_id, pk):
         form = ShoppingListForm(fridge_id=pk)
         return render(request, 'shopping_lists/space.html', {'form': form})
@@ -161,7 +141,7 @@ class ShoppingListCreationView(UserIsInSpaceIdMixin, CreateView):
         return render(request, 'shopping_lists/space.html', {'form': form})
 
 
-class ShoppingListEditView(UserIsInSpaceIdMixin, View):
+class ShoppingListEditView(UserIsInSpaceMixin, View):
     def get(self, request, pk, space_id, fridge_id):
         shopping_list = ShoppingList.objects.get(id=pk)
         form = ShoppingListForm(initial={'name': shopping_list.name})
@@ -180,23 +160,24 @@ class ShoppingListEditView(UserIsInSpaceIdMixin, View):
         return render(request, 'shopping_lists/space.html', {'form': form})
 
 
-class ShoppingListListView(UserIsInSpaceIdMixin, ListView):
+class ShoppingListListView(UserIsInSpaceMixin, ListView):
     model = ShoppingList
 
     def get_queryset(self):
         return ShoppingList.objects.filter(space=Fridge.objects.get(pk=self.kwargs['fridge_id']))
 
 
-class ShoppingListDetailView(UserIsInSpaceIdMixin, DetailView):
+class ShoppingListDetailView(UserIsInSpaceMixin, DetailView):
     model = ShoppingList
 
 
-class ShoppingListDeleteView(UserIsInSpaceIdMixin, DeleteView):
+class ShoppingListDeleteView(UserIsInSpaceMixin, DeleteView):
     model = ShoppingList
     success_url = reverse_lazy('space_list')
     template_name = 'delete_form.html'
 
-class CategoryCreationView(UserIsInSpacePkMixin, View):
+
+class CategoryCreationView(UserIsInSpaceMixin, View):
     def get(self, request, pk):
         form = CategoryForm(space_id=pk)
         return render(request, 'shopping_lists/space.html', {'form': form})
@@ -208,7 +189,5 @@ class CategoryCreationView(UserIsInSpacePkMixin, View):
             return redirect('space_detail', pk=pk)
         return render(request, 'shopping_lists/space.html', {'form': form})
 
-# class CategoryEditView(UserIsInSpaceIdMixin, View):
-# class CategoryDeleteView(UserIsInSpaceIdMixin, DeleteView):
-
-
+# class CategoryEditView(UserIsInSpaceMixin, View):
+# class CategoryDeleteView(UserIsInSpaceMixin, DeleteView):
