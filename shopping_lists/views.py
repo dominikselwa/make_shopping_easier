@@ -1,6 +1,8 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.http import HttpResponseForbidden
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import OperationalError
+from django.http import HttpResponseForbidden, Http404
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -8,26 +10,34 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, ListView, DetailView, DeleteView
 
-from shopping_lists.forms import SpaceModelForm, FridgeForm
-from shopping_lists.models import Space, Fridge
+from shopping_lists.forms import SpaceModelForm, FridgeForm, ShoppingListForm
+from shopping_lists.models import Space, Fridge, ShoppingList
 
 
 class UserIsInSpacePkMixin(UserPassesTestMixin):
     def test_func(self):
         if self.kwargs.get('pk') is not None:
-            return self.request.user in Space.objects.get(pk=self.kwargs['pk']).users.all()
+            try:
+                return self.request.user in Space.objects.get(pk=self.kwargs['pk']).users.all()
+            except ObjectDoesNotExist:
+                raise Http404
 
 
 class UserIsInSpaceIdMixin(UserPassesTestMixin):
     def test_func(self):
         if self.kwargs.get('space_id') is not None:
-            return self.request.user in Space.objects.get(pk=self.kwargs['space_id']).users.all()
+            try:
+                return self.request.user in Space.objects.get(pk=self.kwargs['space_id']).users.all()
+            except ObjectDoesNotExist:
+                raise Http404
+
 
 
 class IndexView(View):
-
     def get(self, request):
         return render(request, 'base.html')
+
+
 
 
 class SingUpView(CreateView):
@@ -73,7 +83,7 @@ class SpaceEditView(UserIsInSpacePkMixin, View):
         return render(request, 'shopping_lists/space.html', {'form': form})
 
 
-class SpaceListView(ListView):
+class SpaceListView(LoginRequiredMixin, ListView):
     model = Space
 
     def get_queryset(self):
@@ -116,7 +126,7 @@ class FridgeEditView(UserIsInSpaceIdMixin, View):
             fridge = Fridge.objects.get(id=pk)
             fridge.name = form.cleaned_data.get('name')
             fridge.save()
-            return redirect('space_detail', pk=space_id)
+            return redirect('fridge_detail', pk=space_id)
         return render(request, 'shopping_lists/space.html', {'form': form})
 
 
@@ -133,5 +143,52 @@ class FridgeDetailView(UserIsInSpaceIdMixin, DetailView):
 
 class FridgeDeleteView(UserIsInSpaceIdMixin, DeleteView):
     model = Fridge
+    success_url = reverse_lazy('space_list')
+    template_name = 'delete_form.html'
+
+
+class ShoppingListCreationView(UserIsInSpaceIdMixin, CreateView):
+    def get(self, request, space_id, fridge_id):
+        form = ShoppingListForm(fridge_id=fridge_id)
+        form.space = space_id
+        return render(request, 'shopping_lists/space.html', {'form': form})
+
+    def post(self, request, space_id, fridge_id):
+        form = ShoppingListForm(request.POST, fridge_id=fridge_id)
+        if form.is_valid():
+            ShoppingList.objects.create(**form.cleaned_data)
+            return redirect('space_detail', pk=space_id)
+        return render(request, 'shopping_lists/space.html', {'form': form})
+
+
+class ShoppingListEditView(UserIsInSpaceIdMixin, View):
+    def get(self, request, pk, space_id, fridge_id):
+        shopping_list = ShoppingList.objects.get(id=pk)
+        form = ShoppingListForm(initial={'name': shopping_list.name})
+        return render(request, 'shopping_lists/space.html', {'form': form})
+
+    def post(self, request, pk, space_id, fridge_id):
+        form = ShoppingListForm(request.POST, fridge_id=fridge_id)
+        if form.is_valid():
+            shopping_list = ShoppingList.objects.get(id=pk)
+            shopping_list.name = form.cleaned_data.get('name')
+            shopping_list.save()
+            return redirect('space_detail', pk=space_id)
+        return render(request, 'shopping_lists/space.html', {'form': form})
+
+
+class ShoppingListListView(UserIsInSpaceIdMixin, ListView):
+    model = ShoppingList
+
+    def get_queryset(self):
+        return ShoppingList.objects.filter(space=Fridge.objects.get(pk=self.kwargs['fridge_id']))
+
+
+class ShoppingListDetailView(UserIsInSpaceIdMixin, DetailView):
+    model = ShoppingList
+
+
+class ShoppingListDeleteView(UserIsInSpaceIdMixin, DeleteView):
+    model = ShoppingList
     success_url = reverse_lazy('space_list')
     template_name = 'delete_form.html'

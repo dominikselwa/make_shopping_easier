@@ -26,7 +26,23 @@ class FridgeForm(forms.Form):
         if name is not None:
             space = Space.objects.get(pk=self.space_id)
             if space.fridges.filter(name=name).count() > 0:
-                raise ValidationError('Nie można dodać do kolejnej lodówki o takiej nazwie')
+                raise ValidationError('Nie można dodać kolejnej lodówki o takiej nazwie')
             cleaned_data['space'] = space
             return cleaned_data
 
+class ShoppingListForm(forms.Form):
+    name = forms.CharField(max_length=32, label='Nazwa listy zakupów')
+
+    def __init__(self, *args, **kwargs):
+        self.fridge_id = kwargs.pop('fridge_id', None)
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get('name')
+        if name is not None:
+            fridge = Fridge.objects.get(pk=self.fridge_id)
+            if fridge.shopping_lists.filter(name=name).count() > 0:
+                raise ValidationError('Nie można dodać kolejnej listy zakupów o takiej nazwie')
+            cleaned_data['fridge'] = fridge
+            return cleaned_data

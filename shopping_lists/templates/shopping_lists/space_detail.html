@@ -6,13 +6,15 @@
 
 {% block content %}
     <div class="card mx-auto mt-5 mb-5">
-        <div class="card-header">{{ object.name}}</div>
+        <div class="card-header">{% include 'object_buttons.html' %}</div>
         <div class="card-body">
-            {% if object.fridges %}
-                Lodówki:
-                {% include 'object_list.html' with object_list=object.fridges.all %}
-            {% endif %}
-
+{#            {% if object.fridges %}#}
+{#                Lodówki:#}
+{#                {% include 'object_list.html' with object_list=object.fridges.all %}#}
+{#            {% endif %}#}
+            {% for fridge in object.fridges.all %}
+                {% include  'detail.html' with object=fridge %}
+            {% endfor %}
         </div>
     </div>
 {% endblock %}

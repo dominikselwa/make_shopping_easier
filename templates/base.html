@@ -20,33 +20,47 @@
         <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Przestrzenie
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            {% for space in spaces %}
-                                <a class="dropdown-item" href="{{ space.get_detail_url }}">{{ space }}</a>
-                            {% endfor %}
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{% url 'space_new' %}">Dodaj przestrzeń</a>
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Lodówki
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            {% for fridge in fridges %}
-                                <a class="dropdown-item" href="{{ fridge.get_detail_url }}">{{ fridge }}</a>
-                            {% endfor %}
-                        </div>
-                    </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href="/shopping-lists/">Listy zakupów</a>
-                    </li>
+                    {% if spaces %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Przestrzenie
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                {% for space in spaces %}
+                                    <a class="dropdown-item" href="{{ space.get_detail_url }}">{{ space }}</a>
+                                {% endfor %}
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{% url 'space_new' %}">Dodaj przestrzeń</a>
+                            </div>
+                        </li>
+                    {% endif %}
+                    {% if fridges %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Lodówki
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                {% for fridge in fridges %}
+                                    <a class="dropdown-item" href="{{ fridge.get_detail_url }}">{{ fridge }}</a>
+                                {% endfor %}
+                            </div>
+                        </li>
+                    {% endif %}
+                    {% if shopping_lists %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Listy zakupów
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                {% for list in shopping_lists %}
+                                    <a class="dropdown-item" href="{{ list.get_detail_url }}">{{ list }}</a>
+                                {% endfor %}
+                            </div>
+                        </li>
+                    {% endif %}
                 {% endif %}
             </ul>
             <ul class="navbar-nav">

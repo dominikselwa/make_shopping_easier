@@ -22,6 +22,9 @@ class Space(models.Model):
     def get_delete_url(self):
         return reverse('space_delete', kwargs={'pk': self.id})
 
+    def add_child_url(self):
+        return reverse('fridge_new', kwargs={'pk': self.id})
+
 
 class Fridge(models.Model):
     name = models.CharField(max_length=32)
@@ -42,11 +45,34 @@ class Fridge(models.Model):
     def get_delete_url(self):
         return reverse('fridge_delete', kwargs={'pk': self.id, 'space_id': self.space.id})
 
+    def add_child_url(self):
+        return reverse('shopping_list_new', kwargs={'pk': self.id, 'space_id': self.space.id})
+
 
 class ShoppingList(models.Model):
     name = models.CharField(max_length=32)
     fridge = models.ForeignKey(Fridge, on_delete=models.CASCADE, related_name='shopping_lists')
 
+    class Meta:
+        unique_together = ('name', 'fridge')
+
+    def __str__(self):
+        return self.name
+
+    def get_detail_url(self):
+        return reverse('shopping_list_detail', kwargs={'pk': self.id,
+                                                'space_id': self.fridge.space.id,
+                                                'fridge_id': self.fridge.id})
+
+    def get_edit_url(self):
+        return reverse('shopping_list_edit', kwargs={'pk': self.id,
+                                              'space_id': self.fridge.space.id,
+                                              'fridge_id': self.fridge.id})
+
+    def get_delete_url(self):
+        return reverse('shopping_list_delete', kwargs={'pk': self.id,
+                                                'space_id': self.fridge.space.id,
+                                                'fridge_id': self.fridge.id})
 
 
 class Category(models.Model):
