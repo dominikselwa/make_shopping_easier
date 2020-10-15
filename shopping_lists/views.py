@@ -100,17 +100,17 @@ class SpaceDeleteView(UserIsInSpacePkMixin, DeleteView):
     template_name = 'delete_form.html'
 
 
-class FridgeCreationView(UserIsInSpaceIdMixin, CreateView):
-    def get(self, request, space_id):
-        form = FridgeForm(space_id=space_id)
-        form.space = space_id
+class FridgeCreationView(UserIsInSpacePkMixin, CreateView):
+    def get(self, request, pk):
+        form = FridgeForm(space_id=pk)
+        form.space = pk
         return render(request, 'shopping_lists/space.html', {'form': form})
 
-    def post(self, request, space_id):
-        form = FridgeForm(request.POST, space_id=space_id)
+    def post(self, request, pk):
+        form = FridgeForm(request.POST, space_id=pk)
         if form.is_valid():
-            Fridge.objects.create(**form.cleaned_data)
-            return redirect('space_detail', pk=space_id)
+            fridge = Fridge.objects.create(**form.cleaned_data)
+            return redirect('fridge_detail', space_id=pk, pk=fridge.id)
         return render(request, 'shopping_lists/space.html', {'form': form})
 
 
@@ -121,20 +121,20 @@ class FridgeEditView(UserIsInSpaceIdMixin, View):
         return render(request, 'shopping_lists/space.html', {'form': form})
 
     def post(self, request, pk, space_id):
-        form = FridgeForm(request.POST, space_id=space_id)
+        form = FridgeForm(request.POST, space_id=space_id, fridge_id=pk)
         if form.is_valid():
             fridge = Fridge.objects.get(id=pk)
             fridge.name = form.cleaned_data.get('name')
             fridge.save()
-            return redirect('fridge_detail', pk=space_id)
+            return redirect('fridge_detail', space_id=space_id, pk=pk)
         return render(request, 'shopping_lists/space.html', {'form': form})
 
 
-class FridgeListView(UserIsInSpaceIdMixin, ListView):
+class FridgeListView(UserIsInSpacePkMixin, ListView):
     model = Fridge
 
     def get_queryset(self):
-        return Fridge.objects.filter(space=Space.objects.get(pk=self.kwargs['space_id']))
+        return Fridge.objects.filter(space=Space.objects.get(pk=self.kwargs['pk']))
 
 
 class FridgeDetailView(UserIsInSpaceIdMixin, DetailView):
@@ -148,16 +148,19 @@ class FridgeDeleteView(UserIsInSpaceIdMixin, DeleteView):
 
 
 class ShoppingListCreationView(UserIsInSpaceIdMixin, CreateView):
-    def get(self, request, space_id, fridge_id):
-        form = ShoppingListForm(fridge_id=fridge_id)
+    def get(self, request, space_id, pk):
+        form = ShoppingListForm(fridge_id=pk)
         form.space = space_id
         return render(request, 'shopping_lists/space.html', {'form': form})
 
-    def post(self, request, space_id, fridge_id):
-        form = ShoppingListForm(request.POST, fridge_id=fridge_id)
+    def post(self, request, space_id, pk):
+        form = ShoppingListForm(request.POST, fridge_id=pk)
         if form.is_valid():
-            ShoppingList.objects.create(**form.cleaned_data)
-            return redirect('space_detail', pk=space_id)
+            shopping_list = ShoppingList.objects.create(**form.cleaned_data)
+            return redirect('shopping_list_detail',
+                            pk=shopping_list.pk,
+                            fridge_id=pk,
+                            space_id=space_id)
         return render(request, 'shopping_lists/space.html', {'form': form})
 
 
@@ -168,12 +171,15 @@ class ShoppingListEditView(UserIsInSpaceIdMixin, View):
         return render(request, 'shopping_lists/space.html', {'form': form})
 
     def post(self, request, pk, space_id, fridge_id):
-        form = ShoppingListForm(request.POST, fridge_id=fridge_id)
+        form = ShoppingListForm(request.POST, fridge_id=fridge_id, shopping_list_id=pk)
         if form.is_valid():
             shopping_list = ShoppingList.objects.get(id=pk)
             shopping_list.name = form.cleaned_data.get('name')
             shopping_list.save()
-            return redirect('space_detail', pk=space_id)
+            return redirect('shopping_list_detail',
+                            pk=pk,
+                            fridge_id=fridge_id,
+                            space_id=space_id)
         return render(request, 'shopping_lists/space.html', {'form': form})
 
 

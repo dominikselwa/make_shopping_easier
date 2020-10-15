@@ -18,6 +18,7 @@ class FridgeForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.space_id = kwargs.pop('space_id', None)
+        self.fridge_id = kwargs.pop('fridge_id', None)
         super().__init__(*args, **kwargs)
 
     def clean(self):
@@ -25,7 +26,7 @@ class FridgeForm(forms.Form):
         name = cleaned_data.get('name')
         if name is not None:
             space = Space.objects.get(pk=self.space_id)
-            if space.fridges.filter(name=name).count() > 0:
+            if space.fridges.filter(name=name).exclude(id=self.fridge_id).count() > 0:
                 raise ValidationError('Nie można dodać kolejnej lodówki o takiej nazwie')
             cleaned_data['space'] = space
             return cleaned_data
@@ -35,6 +36,7 @@ class ShoppingListForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.fridge_id = kwargs.pop('fridge_id', None)
+        self.shopping_list_id = kwargs.pop('shopping_list_id', None)
         super().__init__(*args, **kwargs)
 
     def clean(self):
@@ -42,7 +44,7 @@ class ShoppingListForm(forms.Form):
         name = cleaned_data.get('name')
         if name is not None:
             fridge = Fridge.objects.get(pk=self.fridge_id)
-            if fridge.shopping_lists.filter(name=name).count() > 0:
+            if fridge.shopping_lists.filter(name=name).exclude(id=self.shopping_list_id).count() > 0:
                 raise ValidationError('Nie można dodać kolejnej listy zakupów o takiej nazwie')
             cleaned_data['fridge'] = fridge
             return cleaned_data

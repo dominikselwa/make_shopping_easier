@@ -3,7 +3,7 @@
         {% csrf_token %}
         {{ form.as_p }}
         <div class="text-center">
-            <button type="submit" class="btn btn-success">{% if button_name %}{{ button_name }}{% else %}Prześlij{% endif %}</button>
+            <button type="submit" class="btn btn-success">{% if button_name %}{{ button_name }}{% else %}Zapisz{% endif %}</button>
         </div>
     </form>
 </div>
