@@ -41,4 +41,7 @@ urlpatterns = [
     path('spaces/<int:space_id>/fridges/<int:fridge_id>/lists/<int:pk>/delete/', views.ShoppingListDeleteView.as_view(), name='shopping_list_delete'),
 
     path('spaces/<int:pk>/categories/new/', views.CategoryCreationView.as_view(), name='category_new'),
+    path('spaces/<int:space_id>/categories/<int:pk>/edit/', views.CategoryEditView.as_view(), name='category_edit'),
+    path('spaces/<int:space_id>/categories/<int:pk>/delete/', views.CategoryDeleteView.as_view(), name='category_delete'),
+
 ]

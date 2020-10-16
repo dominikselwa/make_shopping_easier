@@ -189,5 +189,24 @@ class CategoryCreationView(UserIsInSpaceMixin, View):
             return redirect('space_detail', pk=pk)
         return render(request, 'shopping_lists/space.html', {'form': form})
 
-# class CategoryEditView(UserIsInSpaceMixin, View):
-# class CategoryDeleteView(UserIsInSpaceMixin, DeleteView):
+
+class CategoryEditView(UserIsInSpaceMixin, View):
+    def get(self, request, pk, space_id):
+        category = Category.objects.get(id=pk)
+        form = CategoryForm(initial={'name': category.name})
+        return render(request, 'shopping_lists/space.html', {'form': form})
+
+    def post(self, request, pk, space_id):
+        form = CategoryForm(request.POST, space_id=space_id, category_id=pk)
+        if form.is_valid():
+            category = Category.objects.get(id=pk)
+            category.name = form.cleaned_data.get('name')
+            category.save()
+            return redirect('space_detail', pk=space_id)
+        return render(request, 'shopping_lists/space.html', {'form': form})
+
+
+class CategoryDeleteView(UserIsInSpaceMixin, DeleteView):
+    model = Category
+    success_url = reverse_lazy('space_list')
+    template_name = 'delete_form.html'
