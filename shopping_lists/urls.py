@@ -28,7 +28,7 @@ urlpatterns = [
     path('spaces/<int:pk>/edit/', views.SpaceEditView.as_view(), name='space_edit'),
     path('spaces/<int:pk>/delete/', views.SpaceDeleteView.as_view(), name='space_delete'),
 
-    path('spaces/<int:pk>/fridges/', views.FridgeListView.as_view(), name='fridge_list'),
+    # path('spaces/<int:pk>/fridges/', views.FridgeListView.as_view(), name='fridge_list'),
     path('spaces/<int:pk>/fridges/new/', views.FridgeCreationView.as_view(), name='fridge_new'),
     path('spaces/<int:space_id>/fridges/<int:pk>/', views.FridgeDetailView.as_view(), name='fridge_detail'),
     path('spaces/<int:space_id>/fridges/<int:pk>/edit/', views.FridgeEditView.as_view(), name='fridge_edit'),

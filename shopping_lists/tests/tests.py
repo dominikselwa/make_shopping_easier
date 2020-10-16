@@ -44,7 +44,7 @@ def test_login_required(client, url):
         'space_detail',
         'space_edit',
         'space_delete',
-        'fridge_list',
+        # 'fridge_list',
         'fridge_new',
 ))
 @pytest.mark.django_db
@@ -154,9 +154,29 @@ def test_space_delete(client, set_up):
     with pytest.raises(ObjectDoesNotExist):
         Space.objects.get(pk=space.pk)
 
+
 # @pytest.mark.django_db
 # def test_fridge_list(client, set_up):
 #     user = login(client, choice(set_up))
 #     space = user.space_set.first()
 #
-#     fridge
+#     response = client.get(reverse('fridge_list', kwargs={'pk': space.pk}))
+#
+#     objects = response.context['object_list']
+#
+#     for object in objects:
+#         assert object in space.fridges.all()
+#     assert len(objects) == space.fridges.all().count()
+
+@pytest.mark.django_db
+def test_fridge_new(client, set_up):
+    user = login(client, choice(set_up))
+    space = user.space_set.first()
+    fridges_before_creation = space.fridges.all().count()
+    name = 'new fridge babmbabambama'
+
+    response = client.post(reverse('fridge_new', kwargs={'pk': space.pk}), {'name': name}, follow=True)
+
+    fridge = Fridge.objects.get(space=space, name=name)
+    assert response.request['PATH_INFO'] == reverse('fridge_detail', kwargs={'space_id': space.pk, 'pk': fridge.pk})
+    assert space.fridges.all().count() == fridges_before_creation + 1
