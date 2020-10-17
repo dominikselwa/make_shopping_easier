@@ -27,20 +27,24 @@ from django.urls import reverse
 
 class Fridge(models.Model):
     name = models.CharField(max_length=32)
-    users = models.ManyToManyField(User)
+    users = models.ManyToManyField(User, related_name='fridges')
 
     def __str__(self):
         return self.name
-    #
+
+    @staticmethod
+    def get_create_url():
+        return reverse('fridge_create')
+
     # def get_detail_url(self):
-    #     return reverse('fridge_detail', kwargs={'pk': self.id, 'space_id': self.space.id})
-    #
-    # def get_edit_url(self):
-    #     return reverse('fridge_edit', kwargs={'pk': self.id, 'space_id': self.space.id})
-    #
-    # def get_delete_url(self):
-    #     return reverse('fridge_delete', kwargs={'pk': self.id, 'space_id': self.space.id})
-    #
+    #     return reverse('fridge_detail', kwargs={'pk': self.id})
+
+    def get_update_url(self):
+        return reverse('fridge_update', kwargs={'pk': self.pk})
+
+    def get_delete_url(self):
+        return reverse('fridge_delete', kwargs={'pk': self.id})
+
     # def add_child_url(self):
     #     return reverse('shopping_list_new', kwargs={'pk': self.id, 'space_id': self.space.id})
 

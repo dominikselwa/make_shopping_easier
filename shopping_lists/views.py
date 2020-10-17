@@ -1,13 +1,12 @@
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import Http404
 from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, ListView, DetailView, DeleteView
+from django.views.generic import CreateView, ListView, DetailView, DeleteView, UpdateView
 
 from shopping_lists.forms import FridgeModelForm, CategoryModelForm
 from shopping_lists.mixins import UserHasAccessToFridgeMixin
@@ -28,19 +27,40 @@ class SingUpView(CreateView):
 class MainView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'shopping_lists/main.html')
-#
+
+
+class FridgeListView(LoginRequiredMixin, ListView):
+    model = Fridge
+
+    def get_queryset(self):
+        return self.request.user.fridges.all()
+
 
 class FridgeCreateView(LoginRequiredMixin, CreateView):
     model = Fridge
     form_class = FridgeModelForm
     template_name = 'shopping_lists/space.html'
-    success_url = '/new_fridge/'
+    success_url = reverse_lazy('fridge_list')
 
     def form_valid(self, form):
         self.object = form.save()
         self.object.users.add(self.request.user)
         self.object.save()
         return super().form_valid(form)
+
+
+class FridgeUpdateView(UserHasAccessToFridgeMixin, UpdateView):
+    model = Fridge
+    form_class = FridgeModelForm
+    template_name = 'shopping_lists/space.html'
+    success_url = reverse_lazy('fridge_list')
+
+
+class FridgeDeleteView(UserHasAccessToFridgeMixin, DeleteView):
+    model = Fridge
+    template_name = 'delete_form.html'
+    success_url = reverse_lazy('fridge_list')
+
 
 class CategoryCreateView(UserHasAccessToFridgeMixin, CreateView):
     model = Category

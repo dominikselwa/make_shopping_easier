@@ -23,11 +23,11 @@ urlpatterns = [
     path('main/', views.MainView.as_view(), name='main'),
 
 
-    # path('fridges/', views.FridgeListView.as_view(), name='fridge_list'),
-    path('fridge/create/', views.FridgeCreateView.as_view(), name='fridge_create'),
-    # path('fridge/<int:pk>/', views.FridgeDetailView.as_view(), name='fridge_detail'),
-    # path('fridge/<int:pk>/update/', views.FridgeUpdateView.as_view(), name='fridge_update'),
-    # path('fridge/<int:pk>/delete/', views.FridgeDeleteView.as_view(), name='fridge_delete'),
+    path('fridges/', views.FridgeListView.as_view(), name='fridge_list'),
+    path('fridges/create/', views.FridgeCreateView.as_view(), name='fridge_create'),
+    # path('fridges/<int:pk>/', views.FridgeDetailView.as_view(), name='fridge_detail'),
+    path('fridges/<int:pk>/update/', views.FridgeUpdateView.as_view(), name='fridge_update'),
+    path('fridges/<int:pk>/delete/', views.FridgeDeleteView.as_view(), name='fridge_delete'),
     #
     # path('spaces/', views.SpaceListView.as_view(), name='space_list'),
     # path('spaces/new/', views.SpaceCreateView.as_view(), name='space_new'),

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Twoje lodówki
+{% endblock %}
+
+{% block content %}
+    <div class="card mx-auto mt-5 mb-5" style="width: 36rem">
+    <div class="card-header d-flex justify-content-between">
+        <h5>Twoje lodówki:</h5>
+        <a class="btn btn-success btn-sm" href="{{ object_list.first.get_create_url }}">Dodaj lodówkę</a>
+    </div>
+        {% include 'object_list.html' %}
+    </div>
+{% endblock %}

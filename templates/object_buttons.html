@@ -4,7 +4,7 @@
         {% if object.add_child_url %}
             <a class="btn btn-success" href="{{ object.add_child_url }}">Dodaj</a>
         {% endif %}
-        <a class="btn btn-primary" href="{{ object.get_edit_url }}">Edytuj</a>
-        <a class="btn btn-danger" href="{{ object.get_delete_url }}">Usuń</a>
+        <a class="btn btn-primary btn-sm" href="{{ object.get_update_url }}">Edytuj</a>
+        <a class="btn btn-danger btn-sm" href="{{ object.get_delete_url }}">Usuń</a>
     </div>
 </div>
