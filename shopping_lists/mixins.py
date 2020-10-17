@@ -2,20 +2,20 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 
-from shopping_lists.models import Space
+from shopping_lists.models import Fridge
 
 
-class UserIsInSpaceMixin(UserPassesTestMixin):
+class UserHasAccessToFridgeMixin(UserPassesTestMixin):
     def test_func(self):
-        space_id = None
+        fridge_id = None
 
-        if self.kwargs.get('space_id') is not None:
-            space_id = self.kwargs.get('space_id')
+        if self.kwargs.get('fridge_id') is not None:
+            fridge_id = self.kwargs.get('fridge_id')
         elif self.kwargs.get('pk') is not None:
-            space_id = self.kwargs.get('pk')
+            fridge_id = self.kwargs.get('pk')
 
-        if space_id is not None:
+        if fridge_id is not None:
             try:
-                return self.request.user in Space.objects.get(pk=space_id).users.all()
+                return self.request.user in Fridge.objects.get(pk=fridge_id).users.all()
             except ObjectDoesNotExist:
                 raise Http404
