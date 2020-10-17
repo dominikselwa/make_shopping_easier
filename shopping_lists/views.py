@@ -40,7 +40,6 @@ class FridgeCreateView(LoginRequiredMixin, CreateView):
     model = Fridge
     form_class = FridgeModelForm
     template_name = 'shopping_lists/space.html'
-    success_url = reverse_lazy('fridge_list')
 
     def form_valid(self, form):
         self.object = form.save()
@@ -48,18 +47,27 @@ class FridgeCreateView(LoginRequiredMixin, CreateView):
         self.object.save()
         return super().form_valid(form)
 
+    def get_success_url(self):
+        return reverse_lazy('fridge_detail', kwargs={'pk': self.object.pk})
+
 
 class FridgeUpdateView(UserHasAccessToFridgeMixin, UpdateView):
     model = Fridge
     form_class = FridgeModelForm
     template_name = 'shopping_lists/space.html'
-    success_url = reverse_lazy('fridge_list')
+
+    def get_success_url(self):
+        return reverse_lazy('fridge_detail', kwargs={'pk': self.object.pk})
 
 
 class FridgeDeleteView(UserHasAccessToFridgeMixin, DeleteView):
     model = Fridge
     template_name = 'delete_form.html'
     success_url = reverse_lazy('fridge_list')
+
+
+class FridgeDetailView(UserHasAccessToFridgeMixin, DetailView):
+    model = Fridge
 
 
 class CategoryCreateView(UserHasAccessToFridgeMixin, CreateView):
@@ -70,6 +78,9 @@ class CategoryCreateView(UserHasAccessToFridgeMixin, CreateView):
     def get_form(self):
         return CategoryModelForm(fridge_id=self.kwargs['fridge_id'],
                                  **self.get_form_kwargs())
+
+
+
 
 # class FridgeCreationView(LoginRequiredMixin, View):
 #     def get(self, request):

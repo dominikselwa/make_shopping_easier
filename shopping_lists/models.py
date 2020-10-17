@@ -36,8 +36,8 @@ class Fridge(models.Model):
     def get_create_url():
         return reverse('fridge_create')
 
-    # def get_detail_url(self):
-    #     return reverse('fridge_detail', kwargs={'pk': self.id})
+    def get_detail_url(self):
+        return reverse('fridge_detail', kwargs={'pk': self.id})
 
     def get_update_url(self):
         return reverse('fridge_update', kwargs={'pk': self.pk})

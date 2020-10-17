@@ -8,8 +8,7 @@
     <div class="card mx-auto mt-5 mb-5">
         <div class="card-header">{{ object.name}}</div>
         <div class="card-body">
-            Listy zakupów:
-            {% include 'object_list.html' with object_list=object.shopping_lists.all %}
+            {% include 'object_list.html' %}
         </div>
     </div>
 {% endblock %}

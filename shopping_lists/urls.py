@@ -25,7 +25,7 @@ urlpatterns = [
 
     path('fridges/', views.FridgeListView.as_view(), name='fridge_list'),
     path('fridges/create/', views.FridgeCreateView.as_view(), name='fridge_create'),
-    # path('fridges/<int:pk>/', views.FridgeDetailView.as_view(), name='fridge_detail'),
+    path('fridges/<int:pk>/', views.FridgeDetailView.as_view(), name='fridge_detail'),
     path('fridges/<int:pk>/update/', views.FridgeUpdateView.as_view(), name='fridge_update'),
     path('fridges/<int:pk>/delete/', views.FridgeDeleteView.as_view(), name='fridge_delete'),
     #
