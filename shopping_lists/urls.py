@@ -22,12 +22,16 @@ urlpatterns = [
     path('accounts/signup/', views.SingUpView.as_view(), name='signup'),
     path('main/', views.MainView.as_view(), name='main'),
 
-
     path('fridges/', views.FridgeListView.as_view(), name='fridge_list'),
     path('fridges/create/', views.FridgeCreateView.as_view(), name='fridge_create'),
     path('fridges/<int:pk>/', views.FridgeDetailView.as_view(), name='fridge_detail'),
     path('fridges/<int:pk>/update/', views.FridgeUpdateView.as_view(), name='fridge_update'),
     path('fridges/<int:pk>/delete/', views.FridgeDeleteView.as_view(), name='fridge_delete'),
+
+    path('fridges/<int:pk>/category/create/', views.CategoryCreateView.as_view(), name='category_create'),
+    path('fridges/<int:fridge_id>/category/<int:pk>/update/', views.CategoryUpdateView.as_view(), name='category_update'),
+    path('fridges/<int:fridge_id>/category/<int:pk>/delete/', views.CategoryDeleteView.as_view(), name='category_delete'),
+
     #
     # path('spaces/', views.SpaceListView.as_view(), name='space_list'),
     # path('spaces/new/', views.SpaceCreateView.as_view(), name='space_new'),

@@ -73,12 +73,33 @@ class FridgeDetailView(UserHasAccessToFridgeMixin, DetailView):
 class CategoryCreateView(UserHasAccessToFridgeMixin, CreateView):
     model = Category
     template_name = 'shopping_lists/space.html'
-    success_url = '/new_fridge/'
+
+    def get_success_url(self):
+        return reverse_lazy('fridge_detail', kwargs={'pk': self.kwargs['pk']})
+
+    def get_form(self):
+        return CategoryModelForm(fridge_id=self.kwargs['pk'],
+                                 **self.get_form_kwargs())
+
+
+class CategoryUpdateView(UserHasAccessToFridgeMixin, UpdateView):
+    model = Category
+    template_name = 'shopping_lists/space.html'
+
+    def get_success_url(self):
+        return reverse_lazy('fridge_detail', kwargs={'pk': self.kwargs['fridge_id']})
 
     def get_form(self):
         return CategoryModelForm(fridge_id=self.kwargs['fridge_id'],
                                  **self.get_form_kwargs())
 
+
+class CategoryDeleteView(UserHasAccessToFridgeMixin, DeleteView):
+    model = Category
+    template_name = 'delete_form.html'
+
+    def get_success_url(self):
+        return reverse_lazy('fridge_detail', kwargs={'pk': self.kwargs['fridge_id']})
 
 
 
