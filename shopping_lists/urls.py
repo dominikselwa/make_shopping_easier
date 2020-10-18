@@ -36,6 +36,10 @@ urlpatterns = [
     path('fridges/<int:fridge_id>/shop/<int:pk>/update/', views.ShopUpdateView.as_view(), name='shop_update'),
     path('fridges/<int:fridge_id>/shop/<int:pk>/delete/', views.ShopDeleteView.as_view(), name='shop_delete'),
 
+    path('fridges/<int:pk>/product/create/', views.ProductCreateView.as_view(), name='product_create'),
+    path('fridges/<int:fridge_id>/product/<int:pk>/update/', views.ProductUpdateView.as_view(), name='product_update'),
+    path('fridges/<int:fridge_id>/product/<int:pk>/delete/', views.ProductDeleteView.as_view(), name='product_delete'),
+
     #
     # path('spaces/', views.SpaceListView.as_view(), name='space_list'),
     # path('spaces/new/', views.SpaceCreateView.as_view(), name='space_new'),

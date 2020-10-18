@@ -94,3 +94,6 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_unique_error(self):
+        return 'Nie można dodać kolejnego produktu o takiej nazwie'

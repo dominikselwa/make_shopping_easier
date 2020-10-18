@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from shopping_lists.models import Fridge, Category, Shop
+from shopping_lists.models import Fridge, Category, Shop, Product
 
 
 class FridgeUniqueModelForm(forms.ModelForm):
@@ -44,6 +44,34 @@ class ShopModelForm(FridgeUniqueModelForm):
         labels = {
             'name': 'Nazwa sklepu:',
         }
+
+
+class ProductModelForm(FridgeUniqueModelForm):
+    class Meta:
+        model = Product
+        fields = ('name', 'quantity', 'unit', 'category', 'shops', 'is_in_fridge', 'is_in_shopping_list')
+        labels = {
+            'name': 'Nazwa produktu:',
+            'quantity': 'Ilość/Liczba produktów, które mają być widoczne na liście zakupów:',
+            'unit': 'Jednostka jakiej chcesz używać do tego produktu:',
+            'category': 'Kategoria, do której ma być przyporządkowany produkt:',
+            'shops': 'Sklepy w których będziesz kupować ten produkt:',
+            'is_in_fridge': 'Masz ten produkt w lodówce?',
+            'is_in_shopping_list': 'Chcesz go dodać do listy zakupów?',
+        }
+        widgets = {
+            'shops': forms.CheckboxSelectMultiple()
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].queryset = Category.objects.filter(fridge=self.fridge)
+        self.fields['shops'].queryset = Shop.objects.filter(fridge=self.fridge)
+        self.fields['category'].required = False
+        self.fields['unit'].required = False
+        self.fields['quantity'].required = False
+        self.fields['shops'].required = False
+
 
     # def __init__(self, *args, **kwargs):
     #     self.fridge = Fridge.objects.get(pk=kwargs.pop('fridge_id'))
