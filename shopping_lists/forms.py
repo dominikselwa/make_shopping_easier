@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from shopping_lists.models import Fridge, Category
+from shopping_lists.models import Fridge, Category, Shop
 
 
 class FridgeUniqueModelForm(forms.ModelForm):
@@ -13,7 +13,7 @@ class FridgeUniqueModelForm(forms.ModelForm):
         cleaned_data = super().clean()
         name = cleaned_data.get('name')
         if name is not None:
-            if self.fridge.categories.filter(name=name).exclude(id=self.instance.id).count() > 0:
+            if self.Meta.model.objects.filter(fridge=self.fridge, name=name).exclude(id=self.instance.id).count() > 0:
                 raise ValidationError(self.instance.get_unique_error())
             self.instance.fridge = self.fridge
             return cleaned_data
@@ -24,7 +24,7 @@ class FridgeModelForm(forms.ModelForm):
         model = Fridge
         fields = ('name',)
         labels = {
-            'name': 'Nazwa lodówki',
+            'name': 'Nazwa lodówki:',
         }
 
 
@@ -33,7 +33,16 @@ class CategoryModelForm(FridgeUniqueModelForm):
         model = Category
         fields = ('name',)
         labels = {
-            'name': 'Nazwa kategorii',
+            'name': 'Nazwa kategorii:',
+        }
+
+
+class ShopModelForm(FridgeUniqueModelForm):
+    class Meta:
+        model = Shop
+        fields = ('name',)
+        labels = {
+            'name': 'Nazwa sklepu:',
         }
 
     # def __init__(self, *args, **kwargs):

@@ -32,6 +32,10 @@ urlpatterns = [
     path('fridges/<int:fridge_id>/category/<int:pk>/update/', views.CategoryUpdateView.as_view(), name='category_update'),
     path('fridges/<int:fridge_id>/category/<int:pk>/delete/', views.CategoryDeleteView.as_view(), name='category_delete'),
 
+    path('fridges/<int:pk>/shop/create/', views.ShopCreateView.as_view(), name='shop_create'),
+    path('fridges/<int:fridge_id>/shop/<int:pk>/update/', views.ShopUpdateView.as_view(), name='shop_update'),
+    path('fridges/<int:fridge_id>/shop/<int:pk>/delete/', views.ShopDeleteView.as_view(), name='shop_delete'),
+
     #
     # path('spaces/', views.SpaceListView.as_view(), name='space_list'),
     # path('spaces/new/', views.SpaceCreateView.as_view(), name='space_new'),

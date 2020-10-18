@@ -73,11 +73,14 @@ class Shop(models.Model):
     def __str__(self):
         return self.name
 
+    def get_unique_error(self):
+        return 'Nie można dodać kolejnego sklepu o takiej nazwie'
+
 
 class Product(models.Model):
     name = models.CharField(max_length=64)
     fridge = models.ForeignKey(Fridge, on_delete=models.CASCADE, related_name='products')
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products', null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, related_name='products', null=True)
     avg_time_between_purchases = models.IntegerField(null=True, default=None)
     last_bought = models.DateTimeField(null=True, default=None)
     is_in_fridge = models.BooleanField()

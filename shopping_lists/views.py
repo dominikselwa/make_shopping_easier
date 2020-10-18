@@ -8,9 +8,9 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, ListView, DetailView, DeleteView, UpdateView
 
-from shopping_lists.forms import FridgeModelForm, CategoryModelForm
+from shopping_lists.forms import FridgeModelForm, CategoryModelForm, ShopModelForm
 from shopping_lists.mixins import UserHasAccessToFridgeMixin
-from shopping_lists.models import Fridge, Category
+from shopping_lists.models import Fridge, Category, Shop
 
 
 class IndexView(View):
@@ -102,6 +102,36 @@ class CategoryDeleteView(UserHasAccessToFridgeMixin, DeleteView):
         return reverse_lazy('fridge_detail', kwargs={'pk': self.kwargs['fridge_id']})
 
 
+class ShopCreateView(UserHasAccessToFridgeMixin, CreateView):
+    model = Shop
+    template_name = 'shopping_lists/space.html'
+
+    def get_success_url(self):
+        return reverse_lazy('fridge_detail', kwargs={'pk': self.kwargs['pk']})
+
+    def get_form(self):
+        return ShopModelForm(fridge_id=self.kwargs['pk'],
+                             **self.get_form_kwargs())
+
+
+class ShopUpdateView(UserHasAccessToFridgeMixin, UpdateView):
+    model = Shop
+    template_name = 'shopping_lists/space.html'
+
+    def get_success_url(self):
+        return reverse_lazy('fridge_detail', kwargs={'pk': self.kwargs['fridge_id']})
+
+    def get_form(self):
+        return ShopModelForm(fridge_id=self.kwargs['fridge_id'],
+                             **self.get_form_kwargs())
+
+
+class ShopDeleteView(UserHasAccessToFridgeMixin, DeleteView):
+    model = Shop
+    template_name = 'delete_form.html'
+
+    def get_success_url(self):
+        return reverse_lazy('fridge_detail', kwargs={'pk': self.kwargs['fridge_id']})
 
 # class FridgeCreationView(LoginRequiredMixin, View):
 #     def get(self, request):
