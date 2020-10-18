@@ -1,11 +1,11 @@
 # Create your tests here.
-from random import choice
+from random import choice, randint
 
 import pytest
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse, reverse_lazy
 
-from shopping_lists.models import Fridge, Category, Shop
+from shopping_lists.models import Fridge, Category, Shop, Product
 from shopping_lists.tests.utils import login
 
 URLS_WITHOUT_AUTH = (
@@ -24,6 +24,7 @@ URLS_ACCESS_WITH_PK = (
     'fridge_delete',
     'category_create',
     'shop_create',
+    'product_create',
 )
 
 URLS_ACCESS_WITH_FRIDGE_ID = (
@@ -31,6 +32,8 @@ URLS_ACCESS_WITH_FRIDGE_ID = (
     ('category_delete', Category),
     ('shop_update', Shop),
     ('shop_delete', Shop),
+    ('product_update', Product),
+    ('product_delete', Product),
 )
 
 
@@ -232,3 +235,102 @@ def test_shop_delete(client, set_up):
     assert fridge.shops.all().count() == shops_before_delete - 1
     with pytest.raises(ObjectDoesNotExist):
         Shop.objects.get(pk=shop.pk, fridge=fridge)
+
+
+@pytest.mark.django_db
+def test_product_create_min_fields(client, set_up):
+    user = login(client, choice(set_up))
+    fridge = user.fridges.first()
+    products_before_create = fridge.products.all().count()
+    name = 'new product'
+
+    response = client.post(reverse('product_create', kwargs={'pk': fridge.pk}), {'name': name}, follow=True)
+
+    Product.objects.get(fridge=fridge, name=name)
+    assert response.request['PATH_INFO'] == reverse('fridge_detail', kwargs={'pk': fridge.pk})
+    assert fridge.products.all().count() == products_before_create + 1
+
+
+@pytest.mark.django_db
+def test_product_create_all_fields(client, set_up):
+    user = login(client, choice(set_up))
+    fridge = user.fridges.first()
+    products_before_create = fridge.products.all().count()
+    shops = fridge.shops.all()
+    data = {
+        'name': 'new product',
+        'quantity': 5,
+        'unit': 'new unit',
+        'category': fridge.categories.first().pk,
+        'shops': [shop.pk for shop in shops],
+        'is_in_fridge': True,
+        'is_in_shopping_list': False,
+    }
+
+    response = client.post(reverse('product_create', kwargs={'pk': fridge.pk}), data, follow=True)
+
+    data.pop('shops')
+    product = Product.objects.get(**data)
+    for shop in shops:
+        assert shop in product.shops.all()
+    assert len(shops) == product.shops.all().count()
+    assert response.request['PATH_INFO'] == reverse('fridge_detail', kwargs={'pk': fridge.pk})
+    assert fridge.products.all().count() == products_before_create + 1
+
+
+@pytest.mark.django_db
+def test_product_update(client, set_up):
+    user = login(client, choice(set_up))
+    fridge = user.fridges.first()
+    product = fridge.products.first()
+    name = 'edited product'
+
+    response = client.post(reverse('product_update', kwargs={'pk': product.pk, 'fridge_id': fridge.id}),
+                           {'name': name},
+                           follow=True)
+
+    assert response.request['PATH_INFO'] == reverse('fridge_detail', kwargs={'pk': fridge.pk})
+    assert Product.objects.get(pk=product.pk, fridge=fridge).name == name
+
+
+@pytest.mark.django_db
+def test_product_update_all_fields(client, set_up):
+    user = login(client, choice(set_up))
+    fridge = user.fridges.first()
+    product = fridge.products.first()
+    shops = fridge.shops.all()
+    data = {
+        'name': 'edited product',
+        'quantity': 8,
+        'unit': 'edited unit',
+        'category': fridge.categories.first().pk,
+        'shops': [shop.pk for shop in shops],
+        'is_in_fridge': True,
+        'is_in_shopping_list': False,
+    }
+
+    response = client.post(reverse('product_update', kwargs={'pk': product.pk, 'fridge_id': fridge.id}),
+                           data,
+                           follow=True)
+
+    data.pop('shops')
+    product = Product.objects.get(pk=product.pk, **data)
+    for shop in shops:
+        assert shop in product.shops.all()
+    assert len(shops) == product.shops.all().count()
+    assert response.request['PATH_INFO'] == reverse('fridge_detail', kwargs={'pk': fridge.pk})
+
+
+@pytest.mark.django_db
+def test_product_delete(client, set_up):
+    user = login(client, choice(set_up))
+    fridge = user.fridges.first()
+    product = fridge.products.first()
+    products_before_delete = fridge.products.all().count()
+
+    response = client.post(reverse('product_delete', kwargs={'pk': product.pk, 'fridge_id': fridge.id}), follow=True)
+
+    assert response.request['PATH_INFO'] == reverse('fridge_detail', kwargs={'pk': fridge.pk})
+    assert fridge.products.all().count() == products_before_delete - 1
+    with pytest.raises(ObjectDoesNotExist):
+        Product.objects.get(pk=product.pk, fridge=fridge)

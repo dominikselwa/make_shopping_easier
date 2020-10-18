@@ -1,10 +1,10 @@
-from random import randint
+from random import randint, choice, shuffle
 
 import pytest
 from django.contrib.auth.models import User
 from django.test import Client
 
-from shopping_lists.models import Fridge, Category, Shop
+from shopping_lists.models import Fridge, Category, Shop, Product
 
 
 @pytest.fixture
@@ -20,18 +20,20 @@ def set_up():
         users.append(u)
 
     for user in users:
-        for i in range(randint(2, 6)):
+        for i in range(2):
             fridge = Fridge.objects.create(name=str(i))
             fridge.users.add(user)
 
             for j in range(2):
                 Category.objects.create(name=j, fridge=fridge)
-                Shop.objects.create(name=j*10+1, fridge=fridge)
-            # for j in range(randint(3, 7)):
-            #     fridge = Fridge.objects.create(name=str(i + 100 * j), space=space)
-            #
-            #     for k in range(randint(2, 8)):
-            #         ShoppingList.objects.create(name=str(i + j + k), fridge=fridge)
+                Shop.objects.create(name=j * 10 + 1, fridge=fridge)
+
+            for k in range(5):
+                product = Product.objects.create(name=k * 100,
+                                                 fridge=fridge,
+                                                 category=choice(fridge.categories.all()),
+                                                 )
+                product.shops.set(fridge.shops.all()[:randint(1, 2)])
 
     return users
 
@@ -41,6 +43,7 @@ def user_without_fridge():
     class FakeUser:
         password = 'password'
         username = 'username'
+
     user = User.objects.create(username=FakeUser.username)
     user.set_password(FakeUser.password)
     user.save()
