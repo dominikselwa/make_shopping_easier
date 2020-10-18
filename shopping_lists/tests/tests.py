@@ -5,7 +5,7 @@ import pytest
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse, reverse_lazy
 
-from shopping_lists.models import Fridge, Category
+from shopping_lists.models import Fridge, Category, Shop
 from shopping_lists.tests.utils import login
 
 URLS_WITHOUT_AUTH = (
@@ -23,11 +23,14 @@ URLS_ACCESS_WITH_PK = (
     'fridge_update',
     'fridge_delete',
     'category_create',
+    'shop_create',
 )
 
 URLS_ACCESS_WITH_FRIDGE_ID = (
     ('category_update', Category),
     ('category_delete', Category),
+    ('shop_update', Shop),
+    ('shop_delete', Shop),
 )
 
 
@@ -185,3 +188,47 @@ def test_category_delete(client, set_up):
     assert fridge.categories.all().count() == categories_before_delete - 1
     with pytest.raises(ObjectDoesNotExist):
         Category.objects.get(pk=category.pk, fridge=fridge)
+
+
+@pytest.mark.django_db
+def test_shop_create(client, set_up):
+    user = login(client, choice(set_up))
+    fridge = user.fridges.first()
+    shops_before_create = fridge.shops.all().count()
+    name = 'new shop'
+
+    response = client.post(reverse('shop_create', kwargs={'pk': fridge.pk}), {'name': name}, follow=True)
+
+    Shop.objects.get(fridge=fridge, name=name)
+    assert response.request['PATH_INFO'] == reverse('fridge_detail', kwargs={'pk': fridge.pk})
+    assert fridge.shops.all().count() == shops_before_create + 1
+
+
+@pytest.mark.django_db
+def test_shop_update(client, set_up):
+    user = login(client, choice(set_up))
+    fridge = user.fridges.first()
+    shop = fridge.shops.first()
+    name = 'edited shop'
+
+    response = client.post(reverse('shop_update', kwargs={'pk': shop.pk, 'fridge_id': fridge.id}),
+                           {'name': name},
+                           follow=True)
+
+    assert response.request['PATH_INFO'] == reverse('fridge_detail', kwargs={'pk': fridge.pk})
+    assert Shop.objects.get(pk=shop.pk, fridge=fridge).name == name
+
+
+@pytest.mark.django_db
+def test_shop_delete(client, set_up):
+    user = login(client, choice(set_up))
+    fridge = user.fridges.first()
+    shop = fridge.shops.first()
+    shops_before_delete = fridge.shops.all().count()
+
+    response = client.post(reverse('shop_delete', kwargs={'pk': shop.pk, 'fridge_id': fridge.id}), follow=True)
+
+    assert response.request['PATH_INFO'] == reverse('fridge_detail', kwargs={'pk': fridge.pk})
+    assert fridge.shops.all().count() == shops_before_delete - 1
+    with pytest.raises(ObjectDoesNotExist):
+        Shop.objects.get(pk=shop.pk, fridge=fridge)
