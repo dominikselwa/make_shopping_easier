@@ -40,6 +40,7 @@ class Fridge(models.Model):
     def has_products_without_category_in_fridge(self):
         return self.get_products_in_fridge().filter(category=None).count() != 0
 
+
 class Category(models.Model):
     name = models.CharField(max_length=32)
     fridge = models.ForeignKey(Fridge, on_delete=models.CASCADE, related_name='categories')
@@ -90,7 +91,6 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, related_name='products', null=True)
     avg_time_between_purchases = models.IntegerField(null=True, default=None)
     last_bought = models.DateTimeField(null=True, default=None)
-    is_in_fridge = models.BooleanField(default=False)
     is_in_shopping_list = models.BooleanField(default=True)
     unit = models.CharField(max_length=16, default='')
     quantity = models.FloatField(null=True, default=None)

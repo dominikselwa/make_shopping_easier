@@ -263,7 +263,6 @@ def test_product_create_all_fields(client, set_up):
         'unit': 'new unit',
         'category': fridge.categories.first().pk,
         'shops': [shop.pk for shop in shops],
-        'is_in_fridge': True,
         'is_in_shopping_list': False,
     }
 
@@ -305,7 +304,6 @@ def test_product_update_all_fields(client, set_up):
         'unit': 'edited unit',
         'category': fridge.categories.first().pk,
         'shops': [shop.pk for shop in shops],
-        'is_in_fridge': True,
         'is_in_shopping_list': False,
     }
 
