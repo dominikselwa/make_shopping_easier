@@ -241,10 +241,10 @@ class RecipeUpdateView(UserHasAccessToFridgeMixin, UpdateView):
     template_name = 'shopping_lists/space.html'
 
     def get_success_url(self):
-        return reverse_lazy('recipe_detail', kwargs={'pk': self.object.id, 'fridge_id': self.kwargs['pk']})
+        return reverse_lazy('recipe_detail', kwargs={'pk': self.object.id, 'fridge_id': self.object.fridge.id})
 
     def get_form(self):
-        return RecipeModelForm(fridge_id=self.kwargs['pk'],
+        return RecipeModelForm(fridge_id=self.kwargs['fridge_id'],
                                user=self.request.user,
                                **self.get_form_kwargs())
 

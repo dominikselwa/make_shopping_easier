@@ -4,7 +4,7 @@ import pytest
 from django.contrib.auth.models import User
 from django.test import Client
 
-from shopping_lists.models import Fridge, Category, Shop, Product
+from shopping_lists.models import Fridge, Category, Shop, Product, Recipe
 
 
 @pytest.fixture
@@ -27,6 +27,7 @@ def set_up():
             for j in range(2):
                 Category.objects.create(name=j, fridge=fridge)
                 Shop.objects.create(name=j * 10 + 1, fridge=fridge)
+                Recipe.objects.create(name=f'recipe {(j + 1) * 10 + 2}', fridge=fridge, owner=user)
 
             for k in range(5):
                 product = Product.objects.create(name=k * 100,

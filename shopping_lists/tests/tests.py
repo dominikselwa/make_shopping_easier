@@ -5,7 +5,7 @@ import pytest
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse, reverse_lazy
 
-from shopping_lists.models import Fridge, Category, Shop, Product
+from shopping_lists.models import Fridge, Category, Shop, Product, Recipe
 from shopping_lists.tests.utils import login
 
 URLS_WITHOUT_AUTH = (
@@ -16,6 +16,7 @@ URLS_LOGIN_REQUIRED = (
     'main',
     'fridge_list',
     'fridge_create',
+    'recipe_list',
 )
 
 URLS_ACCESS_WITH_PK = (
@@ -27,6 +28,7 @@ URLS_ACCESS_WITH_PK = (
     'product_create',
     'products_to_fridge',
     'products_to_shopping_list',
+    'recipe_create',
 )
 
 URLS_ACCESS_WITH_FRIDGE_ID = (
@@ -36,6 +38,9 @@ URLS_ACCESS_WITH_FRIDGE_ID = (
     ('shop_delete', Shop),
     ('product_update', Product),
     ('product_delete', Product),
+    ('recipe_detail', Recipe),
+    ('recipe_update', Recipe),
+    ('recipe_delete', Recipe),
 )
 
 
@@ -364,3 +369,70 @@ def test_products_to_shopping_fridge(client, set_up):
 
     assert response.request['PATH_INFO'] == reverse('fridge_detail', kwargs={'pk': fridge.pk})
     assert fridge.products.filter(is_in_shopping_list=False).count() == 0 != products_in_shopping_list_before
+
+
+@pytest.mark.django_db
+def test_recipe_list(client, set_up):
+    user = login(client, choice(set_up))
+    response = client.get(reverse('recipe_list'))
+    objects = response.context['object_list']
+
+    for object in objects:
+        assert object in user.recipes.all()
+    assert len(objects) == user.recipes.all().count()
+
+
+@pytest.mark.django_db
+def test_recipe_detail(client, set_up):
+    user = login(client, choice(set_up))
+    recipe = user.recipes.first()
+
+    response = client.get(reverse('recipe_detail', kwargs={'pk': recipe.pk, 'fridge_id': recipe.fridge.id}))
+
+    assert recipe.id == response.context['object'].id
+
+
+@pytest.mark.django_db
+def test_recipe_create(client, set_up):
+    user = login(client, choice(set_up))
+    fridge = user.fridges.first()
+    recipes_before_create = fridge.recipes.all().count()
+    name = 'new recipe'
+
+    response = client.post(reverse('recipe_create', kwargs={'pk': fridge.pk}), {'name': name}, follow=True)
+
+    recipe = Recipe.objects.get(fridge=fridge, name=name, owner=user)
+    assert response.request['PATH_INFO'] == reverse('recipe_detail',
+                                                    kwargs={'pk': recipe.pk, 'fridge_id': recipe.fridge.id})
+    assert fridge.recipes.all().count() == recipes_before_create + 1
+
+
+@pytest.mark.django_db
+def test_recipe_update(client, set_up):
+    user = login(client, choice(set_up))
+    recipe = user.recipes.first()
+    fridge = recipe.fridge
+    name = 'edited recipe'
+
+    response = client.post(reverse('recipe_update', kwargs={'pk': recipe.pk, 'fridge_id': fridge.id}),
+                           {'name': name},
+                           follow=True)
+
+    assert response.request['PATH_INFO'] == reverse('recipe_detail',
+                                                    kwargs={'pk': recipe.pk, 'fridge_id': recipe.fridge.id})
+    assert Recipe.objects.get(pk=recipe.pk, fridge=recipe.fridge, owner=user).name == name
+
+
+@pytest.mark.django_db
+def test_recipe_delete(client, set_up):
+    user = login(client, choice(set_up))
+    recipe = user.recipes.first()
+    recipes_before_delete = user.recipes.all().count()
+
+    response = client.post(reverse('recipe_delete',
+                                   kwargs={'pk': recipe.pk, 'fridge_id': recipe.fridge.id}), follow=True)
+
+    assert response.request['PATH_INFO'] == reverse('fridge_detail', kwargs={'pk': recipe.fridge.pk})
+    assert user.recipes.all().count() == recipes_before_delete - 1
+    with pytest.raises(ObjectDoesNotExist):
+        Recipe.objects.get(pk=recipe.pk, fridge=recipe.fridge)
