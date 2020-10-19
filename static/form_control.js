@@ -1,9 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    inputs = document.querySelectorAll("input:not[type='checkbox']")
+    inputs = document.querySelectorAll("input:not([type='checkbox'])")
+    selects = document.querySelectorAll("select")
 
     for (let el of inputs) {
         if (el.type)
+            el.classList.add('form-control')
+    }
+
+    for (let el of selects) {
         el.classList.add('form-control')
     }
 
@@ -11,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     for (let ul of errorLists) {
         for (let el of ul.children) {
-            el.classList.add('alert','alert-danger')
+            el.classList.add('alert', 'alert-danger')
             el.role = 'alert'
         }
     }
