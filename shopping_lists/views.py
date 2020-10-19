@@ -7,9 +7,10 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, ListView, DetailView, DeleteView, UpdateView
 
-from shopping_lists.forms import FridgeModelForm, CategoryModelForm, ShopModelForm, ProductModelForm
+from shopping_lists.forms import FridgeModelForm, CategoryModelForm, ShopModelForm, ProductModelForm, RecipeModelForm, \
+    ProductInRecipeModelForm
 from shopping_lists.mixins import UserHasAccessToFridgeMixin
-from shopping_lists.models import Fridge, Category, Shop, Product
+from shopping_lists.models import Fridge, Category, Shop, Product, Recipe, ProductInRecipe
 
 
 class IndexView(View):
@@ -73,12 +74,17 @@ class FridgeDetailView(UserHasAccessToFridgeMixin, DetailView):
         product_form = ProductModelForm(fridge_id=self.kwargs['pk'])
         category_form = CategoryModelForm(fridge_id=self.kwargs['pk'])
         shop_form = ShopModelForm(fridge_id=self.kwargs['pk'])
+        recipe_form = RecipeModelForm(fridge_id=self.kwargs['pk'], user=self.request.user)
+
         context.update({'product_form': product_form,
                         'category_form': category_form,
                         'shop_form': shop_form,
+                        'recipe_form': recipe_form,
                         'product_action': reverse_lazy('product_create', kwargs={'pk': self.kwargs['pk']}),
                         'category_action': reverse_lazy('category_create', kwargs={'pk': self.kwargs['pk']}),
-                        'shop_action': reverse_lazy('shop_create', kwargs={'pk': self.kwargs['pk']})})
+                        'shop_action': reverse_lazy('shop_create', kwargs={'pk': self.kwargs['pk']}),
+                        'recipe_action': reverse_lazy('recipe_create', kwargs={'pk': self.kwargs['pk']}),
+                        })
         return context
 
 
@@ -198,3 +204,61 @@ class ProductsToShoppingList(UserHasAccessToFridgeMixin, View):
                 product.is_in_shopping_list = True
                 product.save()
         return redirect(reverse_lazy('fridge_detail', kwargs={'pk': pk}))
+
+
+class RecipeCreateView(UserHasAccessToFridgeMixin, CreateView):
+    model = Recipe
+    template_name = 'shopping_lists/space.html'
+
+    def get_success_url(self):
+        return reverse_lazy('recipe_detail', kwargs={'pk': self.object.id, 'fridge_id': self.kwargs['pk']})
+
+    def get_form(self):
+        return RecipeModelForm(fridge_id=self.kwargs['pk'],
+                               user=self.request.user,
+                               **self.get_form_kwargs())
+
+
+class RecipeDetailView(UserHasAccessToFridgeMixin, DetailView):
+    model = Recipe
+    # template_name = 'shopping_lists/recipe.html'
+
+    # def get_success_url(self):
+    #     return reverse_lazy('recipe_detail', kwargs={'pk': self.kwargs['pk'], 'fridge_id': self.kwargs['fridge_id']})
+
+    # def get_form(self):
+    #     return ProductInRecipeModelForm(recipe=Recipe.objects.get(pk=self.kwargs['pk']),
+    #                                     **self.get_form_kwargs())
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({'object': Recipe.objects.get(pk=self.kwargs['pk'])})
+        return context
+
+
+class RecipeUpdateView(UserHasAccessToFridgeMixin, UpdateView):
+    model = Recipe
+    template_name = 'shopping_lists/space.html'
+
+    def get_success_url(self):
+        return reverse_lazy('recipe_detail', kwargs={'pk': self.object.id, 'fridge_id': self.kwargs['pk']})
+
+    def get_form(self):
+        return RecipeModelForm(fridge_id=self.kwargs['pk'],
+                               user=self.request.user,
+                               **self.get_form_kwargs())
+
+
+class RecipeDeleteView(UserHasAccessToFridgeMixin, DeleteView):
+    model = Recipe
+    template_name = 'delete_form.html'
+
+    def get_success_url(self):
+        return reverse_lazy('fridge_detail', kwargs={'pk': self.kwargs['fridge_id']})
+
+
+class UserRecipeListView(LoginRequiredMixin, ListView):
+    model = Recipe
+
+    def get_queryset(self):
+        return self.request.user.recipes.all()

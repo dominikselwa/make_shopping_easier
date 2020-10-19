@@ -30,6 +30,11 @@
                 <li>
                     <a class="nav-link" id="add-shop-tab" data-toggle="tab" href="#add-shop" role="tab"
                        aria-controls="add-shop" aria-selected="false">Dodaj sklep</a>
+                </li>
+                <li>
+                    <a class="nav-link" id="recipes-tab" data-toggle="tab" href="#recipes" role="tab"
+                       aria-controls="recipes" aria-selected="false">Przepisy</a>
+                </li>
             </ul>
         </div>
         <div class="tab-content" id="myTabContent">
@@ -47,6 +52,9 @@
             </div>
             <div class="tab-pane fade" id="add-shop" role="tabpanel" aria-labelledby="contact-tab">
                 {% include 'form.html' with form=shop_form action=shop_action %}
+            </div>
+            <div class="tab-pane fade" id="recipes" role="tabpanel" aria-labelledby="contact-tab">
+                {% include 'shopping_lists/recipes_in_fridge.html' with form=recipe_form action=recipe_action %}
             </div>
         </div>
     </div>

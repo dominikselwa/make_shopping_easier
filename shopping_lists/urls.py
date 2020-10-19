@@ -46,6 +46,13 @@ urlpatterns = [
     path('fridges/<int:pk>/products-to-shopping-list/', views.ProductsToShoppingList.as_view(),
          name='products_to_shopping_list'),
 
+    path('fridges/<int:pk>/recipe/create/', views.RecipeCreateView.as_view(), name='recipe_create'),
+    path('fridges/<int:fridge_id>/recipe/<int:pk>/', views.RecipeDetailView.as_view(), name='recipe_detail'),
+    path('fridges/<int:fridge_id>/recipe/<int:pk>/update/', views.RecipeUpdateView.as_view(), name='recipe_update'),
+    path('fridges/<int:fridge_id>/recipe/<int:pk>/delete/', views.RecipeDeleteView.as_view(), name='recipe_delete'),
+
+    path('my-recipes/', views.UserRecipeListView.as_view(), name='recipe_list'),
+
 
     #
     # path('spaces/', views.SpaceListView.as_view(), name='space_list'),

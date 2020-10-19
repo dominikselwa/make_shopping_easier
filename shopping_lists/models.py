@@ -138,8 +138,26 @@ class Recipe(models.Model):
     times_used = models.IntegerField(default=0)
     products = models.ManyToManyField(Product, through='ProductInRecipe')
 
+    class Meta:
+        unique_together = ('name', 'fridge')
+
     def __str__(self):
         return self.name
+
+    def get_unique_error(self):
+        return 'Nie można dodać kolejnego przepisu o takiej nazwie'
+
+    def get_detail_url(self):
+        return reverse('recipe_detail', kwargs={'pk': self.id, 'fridge_id': self.fridge.id})
+
+    def get_create_url(self):
+        return reverse('recipe_create', kwargs={'pk': self.fridge.pk})
+
+    def get_update_url(self):
+        return reverse('recipe_update', kwargs={'pk': self.pk, 'fridge_id': self.fridge.id})
+
+    def get_delete_url(self):
+        return reverse('recipe_delete', kwargs={'pk': self.id, 'fridge_id': self.fridge.id})
 
 
 class ProductInRecipe(models.Model):
@@ -149,7 +167,7 @@ class ProductInRecipe(models.Model):
 
     def __str__(self):
         if self.quantity_in_recipe is None:
-            return self.name
+            return self.product.name
         else:
-            return_str = f'{self.name}: {self.quantity_in_recipe}'
+            return_str = f'{self.product.name}: {self.quantity_in_recipe}'
             return return_str if self.product.unit == '' else return_str + f' {self.product.unit}'

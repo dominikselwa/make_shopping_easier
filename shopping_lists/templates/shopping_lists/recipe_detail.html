@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ object}}
+{% endblock %}
+
+{% block content %}
+    <div class="card mx-auto mt-5 mb-5">
+    <div class="card-header">{{ object }}</div>
+        {% include 'object_list.html' with object_list=object.productinrecipe_set.all %}
+        {% include 'form.html' %}
+    </div>
+{% endblock %}
