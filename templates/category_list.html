@@ -1,9 +1,9 @@
 {% load shop %}
 <form method="post"
         {% if shopping_list %}
-      action="{% url 'products_to_fridge' fridge_id=object.id %}"
+      action="{% url 'products_to_fridge' pk=object.id %}"
         {% else %}
-      action="{% url 'products_to_shopping_list' fridge_id=object.id %}"
+      action="{% url 'products_to_shopping_list' pk=object.id %}"
         {% endif %}
 >
     {% csrf_token %}

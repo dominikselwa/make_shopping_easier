@@ -179,22 +179,22 @@ class ProductDeleteView(UserHasAccessToFridgeMixin, DeleteView):
 
 
 class ProductsToFridge(UserHasAccessToFridgeMixin, View):
-    def post(self, request, fridge_id):
+    def post(self, request, pk):
         product_ids = request.POST.getlist('product')
         if product_ids:
             products = Product.objects.filter(id__in=product_ids)
             for product in products:
                 product.is_in_shopping_list = False
                 product.save()
-        return redirect(reverse_lazy('fridge_detail', kwargs={'pk': fridge_id}))
+        return redirect(reverse_lazy('fridge_detail', kwargs={'pk': pk}))
 
 
 class ProductsToShoppingList(UserHasAccessToFridgeMixin, View):
-    def post(self, request, fridge_id):
+    def post(self, request, pk):
         product_ids = request.POST.getlist('product')
         if product_ids:
             products = Product.objects.filter(id__in=product_ids)
             for product in products:
                 product.is_in_shopping_list = True
                 product.save()
-        return redirect(reverse_lazy('fridge_detail', kwargs={'pk': fridge_id}))
+        return redirect(reverse_lazy('fridge_detail', kwargs={'pk': pk}))

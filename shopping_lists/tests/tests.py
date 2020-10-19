@@ -25,6 +25,8 @@ URLS_ACCESS_WITH_PK = (
     'category_create',
     'shop_create',
     'product_create',
+    'products_to_fridge',
+    'products_to_shopping_list',
 )
 
 URLS_ACCESS_WITH_FRIDGE_ID = (
@@ -332,3 +334,33 @@ def test_product_delete(client, set_up):
     assert fridge.products.all().count() == products_before_delete - 1
     with pytest.raises(ObjectDoesNotExist):
         Product.objects.get(pk=product.pk, fridge=fridge)
+
+
+@pytest.mark.django_db
+def test_products_to_fridge(client, set_up):
+    user = login(client, choice(set_up))
+    fridge = user.fridges.first()
+    products = fridge.products.filter(is_in_shopping_list=True)
+    products_in_shopping_list_before = products.count()
+
+    response = client.post(reverse('products_to_fridge', kwargs={'pk': fridge.pk}),
+                           {'product': [product.id for product in products]},
+                           follow=True)
+
+    assert response.request['PATH_INFO'] == reverse('fridge_detail', kwargs={'pk': fridge.pk})
+    assert fridge.products.filter(is_in_shopping_list=True).count() == 0 != products_in_shopping_list_before
+
+
+@pytest.mark.django_db
+def test_products_to_shopping_fridge(client, set_up):
+    user = login(client, choice(set_up))
+    fridge = user.fridges.first()
+    products = fridge.products.filter(is_in_shopping_list=False)
+    products_in_shopping_list_before = products.count()
+
+    response = client.post(reverse('products_to_shopping_list', kwargs={'pk': fridge.pk}),
+                           {'product': [product.id for product in products]},
+                           follow=True)
+
+    assert response.request['PATH_INFO'] == reverse('fridge_detail', kwargs={'pk': fridge.pk})
+    assert fridge.products.filter(is_in_shopping_list=False).count() == 0 != products_in_shopping_list_before

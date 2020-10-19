@@ -32,6 +32,7 @@ def set_up():
                 product = Product.objects.create(name=k * 100,
                                                  fridge=fridge,
                                                  category=choice(fridge.categories.all()),
+                                                 is_in_shopping_list=k % 2 == 0,
                                                  )
                 product.shops.set(fridge.shops.all()[:randint(1, 2)])
 
