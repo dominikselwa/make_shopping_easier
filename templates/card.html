@@ -6,13 +6,24 @@
             {{ category }}
         {% endif %}
     </div>
-    <ul class="list-group list-group-flush">
+<div class="container-fluid">
+<div class="row">
         {% for object in object_list %}
             {% if object.category.id is category.id %}
-                <li class="list-group-item">
-                    {% include 'object_buttons.html' %}
-                </li>
+                <div class="card col-12 col-sm-6 col-md-4 col-xl-3 d-flex">
+                    {% include 'shopping_lists/product_row.html' %}
+                </div>
             {% endif %}
         {% endfor %}
-    </ul>
+</div>
+</div>
+{#    <ul class="list-group list-group-flush">#}
+{#        {% for object in object_list %}#}
+{#            {% if object.category.id is category.id %}#}
+{#                <li class="list-group-item">#}
+{#                    {% include 'shopping_lists/product_row.html' %}#}
+{#                </li>#}
+{#            {% endif %}#}
+{#        {% endfor %}#}
+{#    </ul>#}
 </div>

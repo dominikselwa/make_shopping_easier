@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    inputs = document.querySelectorAll("input")
+    inputs = document.querySelectorAll("input:not[type='checkbox']")
 
     for (let el of inputs) {
+        if (el.type)
         el.classList.add('form-control')
     }
 

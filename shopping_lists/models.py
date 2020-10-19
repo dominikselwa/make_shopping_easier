@@ -28,12 +28,17 @@ class Fridge(models.Model):
     def get_products_in_shopping_list(self):
         return self.products.filter(is_in_shopping_list=True)
 
+    def get_products_in_fridge(self):
+        return self.products.filter(is_in_shopping_list=False)
+
     def has_products_without_category(self):
         return self.products.filter(category=None).count() != 0
 
     def has_products_without_category_in_shopping_list(self):
         return self.get_products_in_shopping_list().filter(category=None).count() != 0
 
+    def has_products_without_category_in_fridge(self):
+        return self.get_products_in_fridge().filter(category=None).count() != 0
 
 class Category(models.Model):
     name = models.CharField(max_length=32)
@@ -95,7 +100,15 @@ class Product(models.Model):
         unique_together = ('name', 'fridge')
 
     def __str__(self):
-        return self.name
+        quantity_str = ''
+        if self.quantity is not None:
+            if self.quantity.is_integer():
+                quantity_str += f' {int(self.quantity)}'
+            else:
+                quantity_str += f' {self.quantity}'
+        # return_str += f' {self.quantity}' if self.quantity is not None else ''
+        quantity_str += f' {self.unit}'
+        return f'{self.name}:{quantity_str}' if len(quantity_str) > 1 else self.name
 
     def get_unique_error(self):
         return 'Nie można dodać kolejnego produktu o takiej nazwie'
