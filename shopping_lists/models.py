@@ -129,3 +129,27 @@ class Product(models.Model):
 
     def get_delete_url(self):
         return reverse('product_delete', kwargs={'pk': self.id, 'fridge_id': self.fridge.id})
+
+
+class Recipe(models.Model):
+    name = models.CharField(max_length=64)
+    owner = models.ForeignKey(User, related_name='recipes', on_delete=models.CASCADE)
+    fridge = models.ForeignKey(Fridge, related_name='recipes', on_delete=models.CASCADE)
+    times_used = models.IntegerField(default=0)
+    products = models.ManyToManyField(Product, through='ProductInRecipe')
+
+    def __str__(self):
+        return self.name
+
+
+class ProductInRecipe(models.Model):
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='recipes')
+    quantity_in_recipe = models.FloatField(null=True, default=None)
+
+    def __str__(self):
+        if self.quantity_in_recipe is None:
+            return self.name
+        else:
+            return_str = f'{self.name}: {self.quantity_in_recipe}'
+            return return_str if self.product.unit == '' else return_str + f' {self.product.unit}'
