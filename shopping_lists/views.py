@@ -1,6 +1,6 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.urls import reverse_lazy
@@ -176,3 +176,25 @@ class ProductDeleteView(UserHasAccessToFridgeMixin, DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('fridge_detail', kwargs={'pk': self.kwargs['fridge_id']})
+
+
+class ProductsToFridge(UserHasAccessToFridgeMixin, View):
+    def post(self, request, fridge_id):
+        product_ids = request.POST.getlist('product')
+        if product_ids:
+            products = Product.objects.filter(id__in=product_ids)
+            for product in products:
+                product.is_in_shopping_list = False
+                product.save()
+        return redirect(reverse_lazy('fridge_detail', kwargs={'pk': fridge_id}))
+
+
+class ProductsToShoppingList(UserHasAccessToFridgeMixin, View):
+    def post(self, request, fridge_id):
+        product_ids = request.POST.getlist('product')
+        if product_ids:
+            products = Product.objects.filter(id__in=product_ids)
+            for product in products:
+                product.is_in_shopping_list = True
+                product.save()
+        return redirect(reverse_lazy('fridge_detail', kwargs={'pk': fridge_id}))

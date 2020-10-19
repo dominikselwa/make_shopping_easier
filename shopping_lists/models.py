@@ -40,6 +40,12 @@ class Fridge(models.Model):
     def has_products_without_category_in_fridge(self):
         return self.get_products_in_fridge().filter(category=None).count() != 0
 
+    def has_products_in_fridge(self):
+        return self.get_products_in_fridge().count() != 0
+
+    def has_products_in_shopping_list(self):
+        return self.get_products_in_shopping_list().count() != 0
+
 
 class Category(models.Model):
     name = models.CharField(max_length=32)
@@ -84,6 +90,9 @@ class Shop(models.Model):
         return Product.objects.filter(fridge=self.fridge, is_in_shopping_list=True).filter(
             models.Q(shops=self) | models.Q(shops=None))
 
+    def has_products_in_shopping_list(self):
+        return self.products.filter(is_in_shopping_list=True).count() != 0
+
 
 class Product(models.Model):
     name = models.CharField(max_length=64)
@@ -106,7 +115,6 @@ class Product(models.Model):
                 quantity_str += f' {int(self.quantity)}'
             else:
                 quantity_str += f' {self.quantity}'
-        # return_str += f' {self.quantity}' if self.quantity is not None else ''
         quantity_str += f' {self.unit}'
         return f'{self.name}:{quantity_str}' if len(quantity_str) > 1 else self.name
 

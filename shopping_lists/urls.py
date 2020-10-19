@@ -29,8 +29,10 @@ urlpatterns = [
     path('fridges/<int:pk>/delete/', views.FridgeDeleteView.as_view(), name='fridge_delete'),
 
     path('fridges/<int:pk>/category/create/', views.CategoryCreateView.as_view(), name='category_create'),
-    path('fridges/<int:fridge_id>/category/<int:pk>/update/', views.CategoryUpdateView.as_view(), name='category_update'),
-    path('fridges/<int:fridge_id>/category/<int:pk>/delete/', views.CategoryDeleteView.as_view(), name='category_delete'),
+    path('fridges/<int:fridge_id>/category/<int:pk>/update/', views.CategoryUpdateView.as_view(),
+         name='category_update'),
+    path('fridges/<int:fridge_id>/category/<int:pk>/delete/', views.CategoryDeleteView.as_view(),
+         name='category_delete'),
 
     path('fridges/<int:pk>/shop/create/', views.ShopCreateView.as_view(), name='shop_create'),
     path('fridges/<int:fridge_id>/shop/<int:pk>/update/', views.ShopUpdateView.as_view(), name='shop_update'),
@@ -39,6 +41,11 @@ urlpatterns = [
     path('fridges/<int:pk>/product/create/', views.ProductCreateView.as_view(), name='product_create'),
     path('fridges/<int:fridge_id>/product/<int:pk>/update/', views.ProductUpdateView.as_view(), name='product_update'),
     path('fridges/<int:fridge_id>/product/<int:pk>/delete/', views.ProductDeleteView.as_view(), name='product_delete'),
+
+    path('fridges/<int:fridge_id>/products-to-fridge/', views.ProductsToFridge.as_view(), name='products_to_fridge'),
+    path('fridges/<int:fridge_id>/products-to-shopping-list/', views.ProductsToShoppingList.as_view(),
+         name='products_to_shopping_list'),
+
 
     #
     # path('spaces/', views.SpaceListView.as_view(), name='space_list'),
