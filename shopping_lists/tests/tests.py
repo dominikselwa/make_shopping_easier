@@ -1,5 +1,5 @@
 # Create your tests here.
-from random import choice, randint
+from random import choice
 
 import pytest
 from django.core.exceptions import ObjectDoesNotExist
@@ -56,7 +56,7 @@ def test_login_required(client, set_up, url):
 def test_login_required_with_pk(client, set_up, url):
     fridge = Fridge.objects.first()
     response = client.get(reverse_lazy(url, kwargs={'pk': fridge.pk}), follow=True)
-    assert response.redirect_chain[0][1] == 302  # [('/accounts/login/?next=/spaces/', 302)]
+    assert response.redirect_chain[0][1] == 302
     assert response.request['PATH_INFO'] == reverse('login')
 
 

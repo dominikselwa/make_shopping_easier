@@ -20,47 +20,33 @@
         <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
-                    {% if spaces %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
-                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Przestrzenie
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                {% for space in spaces %}
-                                    <a class="dropdown-item" href="{{ space.get_detail_url }}">{{ space }}</a>
-                                {% endfor %}
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="{% url 'space_new' %}">Dodaj przestrzeń</a>
-                            </div>
-                        </li>
+                    {% if user.fridges %}
+                        {% if user.fridges.all.count is 0 %}
+                        {% elif user.fridges.all.count is not 1 %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
+                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Moje lodówki
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="{% url 'fridge_list' %}">Wszystkie</a>
+                                    <div class="dropdown-divider"></div>
+                                    {% for fridge in user.fridges.all %}
+                                        <a class="dropdown-item" href="{{ fridge.get_detail_url }}">{{ fridge }}</a>
+                                    {% endfor %}
+                                </div>
+                            </li>
+                        {% else %}
+                            <li class="nav-item active">
+                                <a class="nav-link"
+                                   href="{{ user.fridges.first.get_detail_url }}">{{ user.fridges.first }}</a>
+                            </li>
+                        {% endif %}
                     {% endif %}
-                    {% if fridges %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
-                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Lodówki
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                {% for fridge in fridges %}
-                                    <a class="dropdown-item" href="{{ fridge.get_detail_url }}">{{ fridge }}</a>
-                                {% endfor %}
-                            </div>
-                        </li>
-                    {% endif %}
-                    {% if shopping_lists %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
-                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Listy zakupów
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                {% for list in shopping_lists %}
-                                    <a class="dropdown-item" href="{{ list.get_detail_url }}">{{ list }}</a>
-                                {% endfor %}
-                            </div>
-                        </li>
-                    {% endif %}
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'fridge_create' %}">Nowa lodówka</a>
+                    </li>
                 {% endif %}
             </ul>
             <ul class="navbar-nav">

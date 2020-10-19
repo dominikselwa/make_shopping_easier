@@ -1,0 +1,23 @@
+{% load shop %}
+{% for category in object.categories.all %}
+    {% if shopping_list %}
+        {% if object_list|in_category:category %}
+            {% if category.has_products_in_shopping_list %}
+                {% include 'card.html' %}
+            {% endif %}
+        {% endif %}
+    {% else %}
+        {% if category.has_products %}
+            {% include 'card.html' %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+{% if object.has_products_without_category %}
+    {% if shopping_list %}
+        {% if object.has_products_without_category_in_shopping_list %}
+            {% include 'card.html' with category=None %}
+        {% endif %}
+    {% else %}
+        {% include 'card.html' with category=None %}
+    {% endif %}
+{% endif %}

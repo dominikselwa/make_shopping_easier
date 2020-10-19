@@ -1,5 +1,5 @@
 <div class="card-body">
-    <form method="post" class>
+    <form method="post" {% if action %}action="{{ action }}"{% endif %}>
         {% csrf_token %}
         {{ form.as_p }}
         <div class="text-center">

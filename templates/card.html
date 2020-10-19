@@ -1,0 +1,18 @@
+<div class="card mx-auto">
+    <div class="card-header">
+        {% if category is None %}
+            Produkty bez kategorii
+        {% else %}
+            {{ category }}
+        {% endif %}
+    </div>
+    <ul class="list-group list-group-flush">
+        {% for object in object_list %}
+            {% if object.category.id is category.id %}
+                <li class="list-group-item">
+                    {% include 'object_buttons.html' %}
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>

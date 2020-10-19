@@ -68,6 +68,19 @@ class FridgeDeleteView(UserHasAccessToFridgeMixin, DeleteView):
 class FridgeDetailView(UserHasAccessToFridgeMixin, DetailView):
     model = Fridge
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        product_form = ProductModelForm(fridge_id=self.kwargs['pk'])
+        category_form = CategoryModelForm(fridge_id=self.kwargs['pk'])
+        shop_form = ShopModelForm(fridge_id=self.kwargs['pk'])
+        context.update({'product_form': product_form,
+                        'category_form': category_form,
+                        'shop_form': shop_form,
+                        'product_action': reverse_lazy('product_create', kwargs={'pk': self.kwargs['pk']}),
+                        'category_action': reverse_lazy('category_create', kwargs={'pk': self.kwargs['pk']}),
+                        'shop_action': reverse_lazy('shop_create', kwargs={'pk': self.kwargs['pk']})})
+        return context
+
 
 class CategoryCreateView(UserHasAccessToFridgeMixin, CreateView):
     model = Category

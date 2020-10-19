@@ -5,26 +5,6 @@ from django.db import models
 from django.urls import reverse
 
 
-# class Space(models.Model):
-#     name = models.CharField(max_length=32)
-#     users = models.ManyToManyField(User)
-#
-#     def __str__(self):
-#         return self.name
-#
-#     def get_detail_url(self):
-#         return reverse('space_detail', kwargs={'pk': self.id})
-#
-#     def get_edit_url(self):
-#         return reverse('space_edit', kwargs={'pk': self.id})
-#
-#     def get_delete_url(self):
-#         return reverse('space_delete', kwargs={'pk': self.id})
-#
-#     def add_child_url(self):
-#         return reverse('fridge_new', kwargs={'pk': self.id})
-
-
 class Fridge(models.Model):
     name = models.CharField(max_length=32)
     users = models.ManyToManyField(User, related_name='fridges')
@@ -45,8 +25,14 @@ class Fridge(models.Model):
     def get_delete_url(self):
         return reverse('fridge_delete', kwargs={'pk': self.id})
 
-    # def add_child_url(self):
-    #     return reverse('shopping_list_new', kwargs={'pk': self.id, 'space_id': self.space.id})
+    def get_products_in_shopping_list(self):
+        return self.products.filter(is_in_shopping_list=True)
+
+    def has_products_without_category(self):
+        return self.products.filter(category=None).count() != 0
+
+    def has_products_without_category_in_shopping_list(self):
+        return self.get_products_in_shopping_list().filter(category=None).count() != 0
 
 
 class Category(models.Model):
@@ -62,6 +48,15 @@ class Category(models.Model):
     def get_unique_error(self):
         return 'Nie można dodać kolejnej kategorii o takiej nazwie'
 
+    def get_create_url(self):
+        return reverse('category_create', kwargs={'pk': self.fridge.pk})
+
+    def has_products(self):
+        return self.fridge.products.filter(category=self).count() != 0
+
+    def has_products_in_shopping_list(self):
+        return self.fridge.products.filter(category=self, is_in_shopping_list=True).count() != 0
+
 
 class Shop(models.Model):
     name = models.CharField(max_length=32)
@@ -75,6 +70,13 @@ class Shop(models.Model):
 
     def get_unique_error(self):
         return 'Nie można dodać kolejnego sklepu o takiej nazwie'
+
+    def get_create_url(self):
+        return reverse('shop_create', kwargs={'pk': self.fridge.pk})
+
+    def get_products(self):
+        return Product.objects.filter(fridge=self.fridge, is_in_shopping_list=True).filter(
+            models.Q(shops=self) | models.Q(shops=None))
 
 
 class Product(models.Model):
@@ -97,3 +99,12 @@ class Product(models.Model):
 
     def get_unique_error(self):
         return 'Nie można dodać kolejnego produktu o takiej nazwie'
+
+    def get_create_url(self):
+        return reverse('product_create', kwargs={'pk': self.fridge.pk})
+
+    def get_update_url(self):
+        return reverse('product_update', kwargs={'pk': self.pk, 'fridge_id': self.fridge.id})
+
+    def get_delete_url(self):
+        return reverse('product_delete', kwargs={'pk': self.id, 'fridge_id': self.fridge.id})
