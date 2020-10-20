@@ -311,4 +311,4 @@ class AddRecipeToShoppingListView(UserHasAccessToFridgeMixin, View):
 
             product.save()
 
-        return redirect(reverse_lazy('fridge_detail', kwargs={'pk': fridge_id}) + '#recipe-list')
+        return redirect(reverse_lazy('fridge_detail', kwargs={'pk': fridge_id}))

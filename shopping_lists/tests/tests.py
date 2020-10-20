@@ -44,6 +44,7 @@ URLS_ACCESS_WITH_FRIDGE_ID = (
     ('product_in_recipe_create', Fridge),
     ('product_in_recipe_update', Recipe),
     ('product_in_recipe_delete', Recipe),
+    ('add_recipe_to_shopping_list', Fridge),
 )
 
 
@@ -535,3 +536,40 @@ def test_product_in_recipe_delete(client, set_up):
     assert recipe.productinrecipe_set.all().count() == product_in_recipes_before_delete - 1
     with pytest.raises(ObjectDoesNotExist):
         ProductInRecipe.objects.get(pk=product_in_recipe.pk)
+
+
+@pytest.mark.parametrize(
+    'is_in_shopping_list, product_quantity_before_adding, quantity_in_recipe, resulting_product_quantity',
+    ((True, None, None, None),
+     (True, 3, None, 3),
+     (True, None, 4, 4),
+     (True, 3, 4, 7),
+     (False, None, None, None),
+     (False, 3, None, 3),
+     (False, None, 4, 4),
+     (False, 3, 4, 4),
+     ))
+@pytest.mark.django_db
+def test_add_recipe_to_shopping_list(client, set_up, is_in_shopping_list, product_quantity_before_adding,
+                                     quantity_in_recipe, resulting_product_quantity):
+    user = login(client, choice(set_up))
+    recipe = user.recipes.first()
+    product_in_recipe = recipe.productinrecipe_set.first()
+    product = product_in_recipe.product
+
+    recipe.productinrecipe_set.exclude(pk=product_in_recipe.pk).delete()
+
+    product.is_in_shopping_list = is_in_shopping_list
+    product.quantity = product_quantity_before_adding
+    product.save()
+
+    product_in_recipe.quantity_in_recipe = quantity_in_recipe
+    product_in_recipe.save()
+
+    response = client.get(reverse('add_recipe_to_shopping_list',
+                                  kwargs={'pk': recipe.pk, 'fridge_id': recipe.fridge.id}),
+                          follow=True)
+
+    assert response.request['PATH_INFO'] == reverse('fridge_detail',
+                                                    kwargs={'pk': recipe.fridge.id})
+    assert Product.objects.get(pk=product.pk).quantity == resulting_product_quantity
