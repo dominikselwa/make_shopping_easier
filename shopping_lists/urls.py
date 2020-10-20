@@ -50,6 +50,8 @@ urlpatterns = [
     path('fridges/<int:fridge_id>/recipe/<int:pk>/', views.RecipeDetailView.as_view(), name='recipe_detail'),
     path('fridges/<int:fridge_id>/recipe/<int:pk>/update/', views.RecipeUpdateView.as_view(), name='recipe_update'),
     path('fridges/<int:fridge_id>/recipe/<int:pk>/delete/', views.RecipeDeleteView.as_view(), name='recipe_delete'),
+    path('fridges/<int:fridge_id>/recipe/<int:pk>/add-to-shopping-list/', views.AddRecipeToShoppingListView.as_view(),
+         name='add_recipe_to_shopping_list'),
 
     path('my-recipes/', views.UserRecipeListView.as_view(), name='recipe_list'),
 

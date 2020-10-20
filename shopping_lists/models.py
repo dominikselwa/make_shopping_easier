@@ -159,6 +159,9 @@ class Recipe(models.Model):
     def get_delete_url(self):
         return reverse('recipe_delete', kwargs={'pk': self.id, 'fridge_id': self.fridge.id})
 
+    def get_add_to_shopping_list_url(self):
+        return reverse('add_recipe_to_shopping_list', kwargs={'pk': self.id, 'fridge_id': self.fridge.id})
+
 
 class ProductInRecipe(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)

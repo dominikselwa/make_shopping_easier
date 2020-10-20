@@ -222,15 +222,6 @@ class RecipeCreateView(UserHasAccessToFridgeMixin, CreateView):
 class RecipeDetailView(UserHasAccessToFridgeMixin, DetailView):
     model = Recipe
 
-    # template_name = 'shopping_lists/recipe.html'
-
-    # def get_success_url(self):
-    #     return reverse_lazy('recipe_detail', kwargs={'pk': self.kwargs['pk'], 'fridge_id': self.kwargs['fridge_id']})
-
-    # def get_form(self):
-    #     return ProductInRecipeModelForm(recipe=Recipe.objects.get(pk=self.kwargs['pk']),
-    #                                     **self.get_form_kwargs())
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({'form': ProductInRecipeModelForm(recipe=self.object),
@@ -300,3 +291,24 @@ class ProductInRecipeDeleteView(UserHasAccessToFridgeMixin, DeleteView):
     def get_success_url(self):
         return reverse_lazy('recipe_detail', kwargs={'pk': self.object.recipe.pk,
                                                      'fridge_id': self.kwargs['fridge_id']})
+
+
+class AddRecipeToShoppingListView(UserHasAccessToFridgeMixin, View):
+    def get(self, request, fridge_id, pk):
+        recipe = Recipe.objects.get(pk=pk)
+        for product_in_recipe in recipe.productinrecipe_set.all():
+            product = product_in_recipe.product
+            if product.is_in_shopping_list:
+                if product_in_recipe.quantity_in_recipe is not None:
+                    if product.quantity is None:
+                        product.quantity = product_in_recipe.quantity_in_recipe
+                    else:
+                        product.quantity += product_in_recipe.quantity_in_recipe
+            else:
+                product.is_in_shopping_list = True
+                if product_in_recipe.quantity_in_recipe is not None:
+                    product.quantity = product_in_recipe.quantity_in_recipe
+
+            product.save()
+
+        return redirect(reverse_lazy('fridge_detail', kwargs={'pk': fridge_id}) + '#recipe-list')
