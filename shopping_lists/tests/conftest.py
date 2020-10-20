@@ -1,10 +1,10 @@
-from random import randint, choice, shuffle
+from random import randint, choice, shuffle, random
 
 import pytest
 from django.contrib.auth.models import User
 from django.test import Client
 
-from shopping_lists.models import Fridge, Category, Shop, Product, Recipe
+from shopping_lists.models import Fridge, Category, Shop, Product, Recipe, ProductInRecipe
 
 
 @pytest.fixture
@@ -36,6 +36,12 @@ def set_up():
                                                  is_in_shopping_list=k % 2 == 0,
                                                  )
                 product.shops.set(fridge.shops.all()[:randint(1, 2)])
+
+            for recipe in fridge.recipes.all():
+                for _ in range(3):
+                    product = choice(fridge.products.all())
+                    quantity = choice((random(), None))
+                    ProductInRecipe.objects.create(product=product, quantity_in_recipe=quantity, recipe=recipe)
 
     return users
 

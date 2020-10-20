@@ -270,11 +270,11 @@ class ProductInRecipeCreateView(UserHasAccessToFridgeMixin, CreateView):
     template_name = 'shopping_lists/space.html'
 
     def get_success_url(self):
-        return reverse_lazy('recipe_detail', kwargs={'pk': self.kwargs['recipe_id'],
+        return reverse_lazy('recipe_detail', kwargs={'pk': self.kwargs['pk'],
                                                      'fridge_id': self.kwargs['fridge_id']})
 
     def get_form(self):
-        return ProductInRecipeModelForm(recipe=Recipe.objects.get(pk=self.kwargs['recipe_id']),
+        return ProductInRecipeModelForm(recipe=Recipe.objects.get(pk=self.kwargs['pk']),
                                         **self.get_form_kwargs())
 
 

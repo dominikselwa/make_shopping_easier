@@ -59,27 +59,4 @@ urlpatterns = [
          name='product_in_recipe_update'),
     path('fridges/<int:fridge_id>/product-in-recipe/<int:pk>/delete/', views.ProductInRecipeDeleteView.as_view(),
          name='product_in_recipe_delete'),
-    #
-    # path('spaces/', views.SpaceListView.as_view(), name='space_list'),
-    # path('spaces/new/', views.SpaceCreateView.as_view(), name='space_new'),
-    # path('spaces/<int:pk>/', views.SpaceDetailView.as_view(), name='space_detail'),
-    # path('spaces/<int:pk>/edit/', views.SpaceEditView.as_view(), name='space_edit'),
-    # path('spaces/<int:pk>/delete/', views.SpaceDeleteView.as_view(), name='space_delete'),
-    #
-    # # path('spaces/<int:pk>/fridges/', views.FridgeListView.as_view(), name='fridge_list'),
-    # path('spaces/<int:pk>/fridges/new/', views.FridgeCreationView.as_view(), name='fridge_new'),
-    # path('spaces/<int:space_id>/fridges/<int:pk>/', views.FridgeDetailView.as_view(), name='fridge_detail'),
-    # path('spaces/<int:space_id>/fridges/<int:pk>/edit/', views.FridgeEditView.as_view(), name='fridge_edit'),
-    # path('spaces/<int:space_id>/fridges/<int:pk>/delete/', views.FridgeDeleteView.as_view(), name='fridge_delete'),
-    #
-    # path('spaces/<int:space_id>/fridges/<int:pk>/lists/', views.ShoppingListListView.as_view(), name='shopping_list_list'),
-    # path('spaces/<int:space_id>/fridges/<int:pk>/lists/new/', views.ShoppingListCreationView.as_view(), name='shopping_list_new'),
-    # path('spaces/<int:space_id>/fridges/<int:fridge_id>/lists/<int:pk>/', views.ShoppingListDetailView.as_view(), name='shopping_list_detail'),
-    # path('spaces/<int:space_id>/fridges/<int:fridge_id>/lists/<int:pk>/edit/', views.ShoppingListEditView.as_view(), name='shopping_list_edit'),
-    # path('spaces/<int:space_id>/fridges/<int:fridge_id>/lists/<int:pk>/delete/', views.ShoppingListDeleteView.as_view(), name='shopping_list_delete'),
-    #
-    # path('spaces/<int:pk>/categories/new/', views.CategoryCreationView.as_view(), name='category_new'),
-    # path('spaces/<int:space_id>/categories/<int:pk>/edit/', views.CategoryEditView.as_view(), name='category_edit'),
-    # path('spaces/<int:space_id>/categories/<int:pk>/delete/', views.CategoryDeleteView.as_view(), name='category_delete'),
-
 ]

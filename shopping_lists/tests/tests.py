@@ -1,11 +1,11 @@
 # Create your tests here.
-from random import choice
+from random import choice, random
 
 import pytest
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse, reverse_lazy
 
-from shopping_lists.models import Fridge, Category, Shop, Product, Recipe
+from shopping_lists.models import Fridge, Category, Shop, Product, Recipe, ProductInRecipe
 from shopping_lists.tests.utils import login
 
 URLS_WITHOUT_AUTH = (
@@ -32,15 +32,18 @@ URLS_ACCESS_WITH_PK = (
 )
 
 URLS_ACCESS_WITH_FRIDGE_ID = (
-    ('category_update', Category),
-    ('category_delete', Category),
-    ('shop_update', Shop),
-    ('shop_delete', Shop),
-    ('product_update', Product),
-    ('product_delete', Product),
-    ('recipe_detail', Recipe),
-    ('recipe_update', Recipe),
-    ('recipe_delete', Recipe),
+    ('category_update', Fridge),
+    ('category_delete', Fridge),
+    ('shop_update', Fridge),
+    ('shop_delete', Fridge),
+    ('product_update', Fridge),
+    ('product_delete', Fridge),
+    ('recipe_detail', Fridge),
+    ('recipe_update', Fridge),
+    ('recipe_delete', Fridge),
+    ('product_in_recipe_create', Fridge),
+    ('product_in_recipe_update', Recipe),
+    ('product_in_recipe_delete', Recipe),
 )
 
 
@@ -67,12 +70,12 @@ def test_login_required_with_pk(client, set_up, url):
     assert response.request['PATH_INFO'] == reverse('login')
 
 
-@pytest.mark.parametrize('url, model', URLS_ACCESS_WITH_FRIDGE_ID)
+@pytest.mark.parametrize('url, parent_model', URLS_ACCESS_WITH_FRIDGE_ID)
 @pytest.mark.django_db
-def test_login_required_with_fridge_id(client, set_up, url, model):
-    fridge = Fridge.objects.first()
-    model_instance = model.objects.filter(fridge=fridge).first()
-    response = client.get(reverse_lazy(url, kwargs={'pk': model_instance.pk, 'fridge_id': fridge.id}), follow=True)
+def test_login_required_with_fridge_id(client, set_up, url, parent_model):
+    parent_model_instance = parent_model.objects.first()
+    fridge_id = parent_model_instance.id if parent_model == Fridge else parent_model_instance.fridge.id
+    response = client.get(reverse_lazy(url, kwargs={'pk': 1, 'fridge_id': fridge_id}), follow=True)
     assert response.redirect_chain[0][1] == 302
     assert response.request['PATH_INFO'] == reverse('login')
 
@@ -86,13 +89,13 @@ def test_restrict_access_with_pk(client, set_up, user_without_fridge, url):
     assert response.status_code == 403
 
 
-@pytest.mark.parametrize('url, model', URLS_ACCESS_WITH_FRIDGE_ID)
+@pytest.mark.parametrize('url, parent_model', URLS_ACCESS_WITH_FRIDGE_ID)
 @pytest.mark.django_db
-def test_restrict_access_with_fridge_id(client, set_up, user_without_fridge, url, model):
+def test_restrict_access_with_fridge_id(client, set_up, user_without_fridge, url, parent_model):
     client.login(username=user_without_fridge.username, password=user_without_fridge.password)
-    fridge = Fridge.objects.first()
-    model_instance = model.objects.filter(fridge=fridge).first()
-    response = client.get(reverse_lazy(url, kwargs={'pk': model_instance.pk, 'fridge_id': fridge.id}), follow=True)
+    parent_model_instance = parent_model.objects.first()
+    fridge_id = parent_model_instance.id if parent_model == Fridge else parent_model_instance.fridge.id
+    response = client.get(reverse_lazy(url, kwargs={'pk': 1, 'fridge_id': fridge_id}), follow=True)
     assert response.status_code == 403
 
 
@@ -436,3 +439,99 @@ def test_recipe_delete(client, set_up):
     assert user.recipes.all().count() == recipes_before_delete - 1
     with pytest.raises(ObjectDoesNotExist):
         Recipe.objects.get(pk=recipe.pk, fridge=recipe.fridge)
+
+
+@pytest.mark.django_db
+def test_product_in_recipe_create_max(client, set_up):
+    user = login(client, choice(set_up))
+    recipe = user.recipes.first()
+    product_in_recipes_before_create = recipe.productinrecipe_set.all().count()
+    product = choice(recipe.fridge.products.all())
+    quantity = 20
+
+    response = client.post(reverse('product_in_recipe_create',
+                                   kwargs={'pk': recipe.pk, 'fridge_id': recipe.fridge.pk}),
+                           {'product': product.id, 'quantity_in_recipe': quantity},
+                           follow=True)
+
+    assert response.request['PATH_INFO'] == reverse('recipe_detail',
+                                                    kwargs={'pk': recipe.pk,
+                                                            'fridge_id': recipe.fridge.id})
+    assert recipe.productinrecipe_set.all().count() == product_in_recipes_before_create + 1
+
+
+@pytest.mark.django_db
+def test_product_in_recipe_create_min(client, set_up):
+    user = login(client, choice(set_up))
+    recipe = user.recipes.first()
+    product_in_recipes_before_create = recipe.productinrecipe_set.all().count()
+    product = choice(recipe.fridge.products.all())
+
+    response = client.post(reverse('product_in_recipe_create',
+                                   kwargs={'pk': recipe.pk, 'fridge_id': recipe.fridge.pk}),
+                           {'product': product.id},
+                           follow=True)
+
+    assert response.request['PATH_INFO'] == reverse('recipe_detail',
+                                                    kwargs={'pk': recipe.pk,
+                                                            'fridge_id': recipe.fridge.id})
+    assert recipe.productinrecipe_set.all().count() == product_in_recipes_before_create + 1
+
+
+@pytest.mark.django_db
+def test_product_in_recipe_update_max(client, set_up):
+    user = login(client, choice(set_up))
+    recipe = user.recipes.first()
+    product_in_recipe = recipe.productinrecipe_set.first()
+    product = choice(recipe.fridge.products.all())
+    quantity = 20
+
+    response = client.post(reverse('product_in_recipe_update',
+                                   kwargs={'pk': product_in_recipe.pk, 'fridge_id': recipe.fridge.pk}),
+                           {'product': product.id, 'quantity_in_recipe': quantity},
+                           follow=True)
+
+    assert response.request['PATH_INFO'] == reverse('recipe_detail',
+                                                    kwargs={'pk': recipe.pk,
+                                                            'fridge_id': recipe.fridge.id})
+    ProductInRecipe.objects.get(pk=product_in_recipe.pk, recipe=recipe, product=product, quantity_in_recipe=quantity)
+
+
+@pytest.mark.django_db
+def test_product_in_recipe_update_min(client, set_up):
+    user = login(client, choice(set_up))
+    recipe = user.recipes.first()
+    product_in_recipe = recipe.productinrecipe_set.first()
+    product = choice(recipe.fridge.products.all())
+
+    response = client.post(reverse('product_in_recipe_update',
+                                   kwargs={'pk': product_in_recipe.pk, 'fridge_id': recipe.fridge.pk}),
+                           {'product': product.id},
+                           follow=True)
+
+    assert response.request['PATH_INFO'] == reverse('recipe_detail',
+                                                    kwargs={'pk': recipe.pk,
+                                                            'fridge_id': recipe.fridge.id})
+    ProductInRecipe.objects.get(pk=product_in_recipe.pk,
+                                recipe=recipe,
+                                product=product,
+                                quantity_in_recipe=product_in_recipe.quantity_in_recipe)
+
+
+@pytest.mark.django_db
+def test_product_in_recipe_delete(client, set_up):
+    user = login(client, choice(set_up))
+    recipe = user.recipes.first()
+    product_in_recipes_before_delete = recipe.productinrecipe_set.all().count()
+    product_in_recipe = recipe.productinrecipe_set.first()
+
+    response = client.post(reverse('product_in_recipe_delete',
+                                   kwargs={'pk': product_in_recipe.pk, 'fridge_id': recipe.fridge.pk}),
+                           follow=True)
+
+    assert response.request['PATH_INFO'] == reverse('recipe_detail',
+                                                    kwargs={'pk': recipe.pk,
+                                                            'fridge_id': recipe.fridge.id})
+    assert recipe.productinrecipe_set.all().count() == product_in_recipes_before_delete - 1
+    with pytest.raises(ObjectDoesNotExist):
+        ProductInRecipe.objects.get(pk=product_in_recipe.pk)
