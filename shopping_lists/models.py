@@ -180,3 +180,9 @@ class ProductInRecipe(models.Model):
 
     def get_delete_url(self):
         return reverse('product_in_recipe_delete', kwargs={'pk': self.id, 'fridge_id': self.recipe.fridge.id})
+
+
+class Invitation(models.Model):
+    fridge = models.ForeignKey(Fridge, on_delete=models.CASCADE)
+    slug = models.SlugField(unique=True)
+    is_used = models.IntegerField(default=False)
