@@ -1,10 +1,11 @@
 from random import randint, choice, shuffle, random
+from secrets import token_urlsafe
 
 import pytest
 from django.contrib.auth.models import User
 from django.test import Client
 
-from shopping_lists.models import Fridge, Category, Shop, Product, Recipe, ProductInRecipe
+from shopping_lists.models import Fridge, Category, Shop, Product, Recipe, ProductInRecipe, Invitation
 
 
 @pytest.fixture
@@ -28,6 +29,12 @@ def set_up():
                 Category.objects.create(name=j, fridge=fridge)
                 Shop.objects.create(name=j * 10 + 1, fridge=fridge)
                 Recipe.objects.create(name=f'recipe {(j + 1) * 10 + 2}', fridge=fridge, owner=user)
+
+                unique_slug = token_urlsafe(32)
+                while Invitation.objects.filter(slug=unique_slug).count() != 0:
+                    unique_slug = token_urlsafe(32)
+
+                Invitation.objects.create(slug=unique_slug, fridge=fridge)
 
             for k in range(5):
                 product = Product.objects.create(name=k * 100,

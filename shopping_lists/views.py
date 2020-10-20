@@ -324,7 +324,6 @@ class InvitationCreateView(UserHasAccessToFridgeMixin, View):
 
         unique_slug = token_urlsafe(32)
         while Invitation.objects.filter(slug=unique_slug).count() != 0:
-            print(unique_slug)
             unique_slug = token_urlsafe(32)
 
         invitation = Invitation.objects.create(slug=unique_slug, fridge=fridge)

@@ -185,4 +185,3 @@ class ProductInRecipe(models.Model):
 class Invitation(models.Model):
     fridge = models.ForeignKey(Fridge, on_delete=models.CASCADE)
     slug = models.SlugField(unique=True)
-    is_used = models.IntegerField(default=False)

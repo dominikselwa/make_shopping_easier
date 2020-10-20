@@ -5,7 +5,7 @@ import pytest
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse, reverse_lazy
 
-from shopping_lists.models import Fridge, Category, Shop, Product, Recipe, ProductInRecipe
+from shopping_lists.models import Fridge, Category, Shop, Product, Recipe, ProductInRecipe, Invitation
 from shopping_lists.tests.utils import login
 
 URLS_WITHOUT_AUTH = (
@@ -19,6 +19,10 @@ URLS_LOGIN_REQUIRED = (
     'recipe_list',
 )
 
+URLS_LOGIN_REQUIRED_SLUG = (
+    'invitation_accept',
+)
+
 URLS_ACCESS_WITH_PK = (
     'fridge_detail',
     'fridge_update',
@@ -29,6 +33,7 @@ URLS_ACCESS_WITH_PK = (
     'products_to_fridge',
     'products_to_shopping_list',
     'recipe_create',
+    'invitation_create',
 )
 
 URLS_ACCESS_WITH_FRIDGE_ID = (
@@ -45,6 +50,7 @@ URLS_ACCESS_WITH_FRIDGE_ID = (
     ('product_in_recipe_update', Recipe),
     ('product_in_recipe_delete', Recipe),
     ('add_recipe_to_shopping_list', Fridge),
+    ('invitation_show', Fridge),
 )
 
 
@@ -59,6 +65,14 @@ def test_index(client, url):
 def test_login_required(client, set_up, url):
     response = client.get(reverse_lazy(url), follow=True)
     assert response.redirect_chain[0][1] == 302  # [('/accounts/login/?next=/spaces/', 302)]
+    assert response.request['PATH_INFO'] == reverse('login')
+
+
+@pytest.mark.parametrize('url', URLS_LOGIN_REQUIRED_SLUG)
+@pytest.mark.django_db
+def test_login_required(client, set_up, url):
+    response = client.get(reverse_lazy(url, kwargs={'slug': '1'}), follow=True)
+    assert response.redirect_chain[0][1] == 302
     assert response.request['PATH_INFO'] == reverse('login')
 
 
@@ -573,3 +587,48 @@ def test_add_recipe_to_shopping_list(client, set_up, is_in_shopping_list, produc
     assert response.request['PATH_INFO'] == reverse('fridge_detail',
                                                     kwargs={'pk': recipe.fridge.id})
     assert Product.objects.get(pk=product.pk).quantity == resulting_product_quantity
+
+
+@pytest.mark.django_db
+def test_invitation_create(client, set_up):
+    user = login(client, choice(set_up))
+    fridge = user.fridges.first()
+    invitations_before_create = fridge.invitation_set.all().count()
+
+    response = client.get(reverse('invitation_create', kwargs={'pk': fridge.pk}), follow=True)
+
+    invitation = response.context['object']
+    assert response.request['PATH_INFO'] == reverse('invitation_show',
+                                                    kwargs={'pk': invitation.pk, 'fridge_id': fridge.id})
+    assert fridge.invitation_set.all().count() == invitations_before_create + 1
+
+
+@pytest.mark.django_db
+def test_invitation_show(client, set_up):
+    user = login(client, choice(set_up))
+    fridge = user.fridges.first()
+    invitation = fridge.invitation_set.first()
+
+    response = client.get(reverse('invitation_show', kwargs={'pk': invitation.pk, 'fridge_id': fridge.id}))
+
+    assert invitation.slug == response.context['object'].slug
+
+
+@pytest.mark.django_db
+def test_invitation_accept(client, set_up):
+    user_that_generates_invitation = set_up[0]
+    user_that_accepts_invitation = set_up[1]
+
+    fridge = user_that_generates_invitation.fridges.last()
+    invitation = fridge.invitation_set.first()
+    invitations_before_accept = fridge.invitation_set.all().count()
+
+    login(client, user_that_accepts_invitation)
+
+    response = client.get(reverse('fridge_detail', kwargs={'pk': invitation.fridge.id}))
+    assert response.status_code == 403
+
+    response = client.get(reverse('invitation_accept', kwargs={'slug': invitation.slug}), follow=True)
+
+    assert response.request['PATH_INFO'] == reverse('fridge_detail', kwargs={'pk': invitation.fridge.id})
+    assert fridge.invitation_set.all().count() == invitations_before_accept - 1
