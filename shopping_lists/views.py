@@ -1,5 +1,9 @@
+from secrets import token_urlsafe
+
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -10,7 +14,7 @@ from django.views.generic import CreateView, ListView, DetailView, DeleteView, U
 from shopping_lists.forms import FridgeModelForm, CategoryModelForm, ShopModelForm, ProductModelForm, RecipeModelForm, \
     ProductInRecipeModelForm
 from shopping_lists.mixins import UserHasAccessToFridgeMixin
-from shopping_lists.models import Fridge, Category, Shop, Product, Recipe, ProductInRecipe
+from shopping_lists.models import Fridge, Category, Shop, Product, Recipe, ProductInRecipe, Invitation
 
 
 class IndexView(View):
@@ -312,3 +316,35 @@ class AddRecipeToShoppingListView(UserHasAccessToFridgeMixin, View):
             product.save()
 
         return redirect(reverse_lazy('fridge_detail', kwargs={'pk': fridge_id}))
+
+
+class InvitationCreateView(UserHasAccessToFridgeMixin, View):
+    def get(self, request, pk):
+        fridge = Fridge.objects.get(pk=pk)
+
+        unique_slug = token_urlsafe(32)
+        while Invitation.objects.filter(slug=unique_slug).count() != 0:
+            print(unique_slug)
+            unique_slug = token_urlsafe(32)
+
+        invitation = Invitation.objects.create(slug=unique_slug, fridge=fridge)
+
+        return redirect(reverse_lazy('invitation_show', kwargs={'fridge_id': pk, 'pk': invitation.pk}))
+
+
+class InvitationShowView(UserHasAccessToFridgeMixin, DetailView):
+    model = Invitation
+
+
+class InvitationAcceptView(LoginRequiredMixin, View):
+    def get(self, request, slug):
+        try:
+            invitation = Invitation.objects.get(slug=slug)
+        except ObjectDoesNotExist:
+            raise Http404
+        fridge = invitation.fridge
+
+        fridge.users.add(request.user)
+        invitation.delete()
+
+        return redirect(reverse_lazy('fridge_detail', kwargs={'pk': invitation.fridge.pk}))

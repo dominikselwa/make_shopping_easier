@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Zaproszenie
+{% endblock %}
+
+{% block content %}
+    <div class="card mx-auto mt-5 mb-5" style="width: 40rem">
+        <div class="card-header">Zaproszenie</div>
+        <div class="card-body">
+            {% url 'invitation_accept' slug=object.slug %}
+        </div>
+    </div>
+{% endblock %}

@@ -61,4 +61,9 @@ urlpatterns = [
          name='product_in_recipe_update'),
     path('fridges/<int:fridge_id>/product-in-recipe/<int:pk>/delete/', views.ProductInRecipeDeleteView.as_view(),
          name='product_in_recipe_delete'),
+
+    path('fridges/<int:pk>/invitation/create/', views.InvitationCreateView.as_view(), name='invitation_create'),
+    path('invitation/<slug:slug>/', views.InvitationAcceptView.as_view(), name='invitation_accept'),
+    path('fridges/<int:fridge_id>/invitation/<int:pk>/', views.InvitationShowView.as_view(), name='invitation_show'),
+
 ]

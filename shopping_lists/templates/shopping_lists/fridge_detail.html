@@ -35,26 +35,37 @@
                     <a class="nav-link" id="recipes-tab" data-toggle="tab" href="#recipes" role="tab"
                        aria-controls="recipes" aria-selected="false">Przepisy</a>
                 </li>
+                <li>
+                    <a class="nav-link" id="add-user-tab" data-toggle="tab" href="#add-user" role="tab"
+                       aria-controls="add-user" aria-selected="false">Dodaj użytkownika</a>
+                </li>
             </ul>
         </div>
         <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="fridge" role="tabpanel" aria-labelledby="profile-tab">
+            <div class="tab-pane fade show active" id="fridge" role="tabpanel" aria-labelledby="fridge-tab">
                 {% include 'category_list.html' with object_list=object.get_products_in_fridge %}
             </div>
-            <div class="tab-pane fade" id="shopping-list" role="tabpanel" aria-labelledby="contact-tab">
+            <div class="tab-pane fade" id="shopping-list" role="tabpanel" aria-labelledby="shopping-list-tab">
                 {% include 'shops.html' with object_list=object.get_products_in_shopping_list shopping_list=True %}
             </div>
-            <div class="tab-pane fade" id="add-product" role="tabpanel" aria-labelledby="contact-tab">
+            <div class="tab-pane fade" id="add-product" role="tabpanel" aria-labelledby="add-product-tab">
                 {% include 'form.html' with form=product_form action=product_action %}
             </div>
-            <div class="tab-pane fade" id="add-category" role="tabpanel" aria-labelledby="contact-tab">
+            <div class="tab-pane fade" id="add-category" role="tabpanel" aria-labelledby="add-category-tab">
                 {% include 'form.html' with form=category_form action=category_action %}
             </div>
-            <div class="tab-pane fade" id="add-shop" role="tabpanel" aria-labelledby="contact-tab">
+            <div class="tab-pane fade" id="add-shop" role="tabpanel" aria-labelledby="add-shop-tab">
                 {% include 'form.html' with form=shop_form action=shop_action %}
             </div>
-            <div class="tab-pane fade" id="recipes" role="tabpanel" aria-labelledby="contact-tab">
+            <div class="tab-pane fade" id="recipes" role="tabpanel" aria-labelledby="recipes-tab">
                 {% include 'shopping_lists/recipes_in_fridge.html' with form=recipe_form action=recipe_action %}
+            </div>
+            <div class="tab-pane fade" id="add-user" role="tabpanel" aria-labelledby="add-user-tab">
+                <div class="card">
+                    <a class="btn btn-success" href="{% url 'invitation_create' pk=object.pk %}">
+                        Generuj kod do dodania użytkownika
+                    </a>
+                </div>
             </div>
         </div>
     </div>
