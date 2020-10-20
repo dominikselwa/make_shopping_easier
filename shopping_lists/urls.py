@@ -53,7 +53,12 @@ urlpatterns = [
 
     path('my-recipes/', views.UserRecipeListView.as_view(), name='recipe_list'),
 
-
+    path('fridges/<int:fridge_id>/recipe/<int:pk>/product-in-recipe/create/',
+         views.ProductInRecipeCreateView.as_view(), name='product_in_recipe_create'),
+    path('fridges/<int:fridge_id>/product-in-recipe/<int:pk>/update/', views.ProductInRecipeUpdateView.as_view(),
+         name='product_in_recipe_update'),
+    path('fridges/<int:fridge_id>/product-in-recipe/<int:pk>/delete/', views.ProductInRecipeDeleteView.as_view(),
+         name='product_in_recipe_delete'),
     #
     # path('spaces/', views.SpaceListView.as_view(), name='space_list'),
     # path('spaces/new/', views.SpaceCreateView.as_view(), name='space_new'),

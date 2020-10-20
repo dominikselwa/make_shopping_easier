@@ -98,12 +98,18 @@ class ProductInRecipeModelForm(forms.ModelForm):
         fields = ('product', 'quantity_in_recipe')
 
     def __init__(self, *args, **kwargs):
-        self.recipe = kwargs.pop('recipe')
+        self.recipe = kwargs.pop('recipe', None)
         super().__init__(*args, **kwargs)
+        if self.recipe is None:
+            self.recipe = self.instance.recipe
+        self.fields['product'].queryset = Product.objects.filter(fridge=self.recipe.fridge)
+        self.fields['quantity_in_recipe'].required = False
+        self.fields['quantity_in_recipe'].widget.attrs['min'] = 0
 
     def clean(self):
         cleaned_data = super().clean()
-        self.instance.recipe = self.recipe
+        if self.recipe is not None:
+            self.instance.recipe = self.recipe
         return cleaned_data
 
 # na przyszłość

@@ -171,3 +171,9 @@ class ProductInRecipe(models.Model):
         else:
             return_str = f'{self.product.name}: {self.quantity_in_recipe}'
             return return_str if self.product.unit == '' else return_str + f' {self.product.unit}'
+
+    def get_update_url(self):
+        return reverse('product_in_recipe_update', kwargs={'pk': self.pk, 'fridge_id': self.recipe.fridge.id})
+
+    def get_delete_url(self):
+        return reverse('product_in_recipe_delete', kwargs={'pk': self.id, 'fridge_id': self.recipe.fridge.id})

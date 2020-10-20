@@ -221,6 +221,7 @@ class RecipeCreateView(UserHasAccessToFridgeMixin, CreateView):
 
 class RecipeDetailView(UserHasAccessToFridgeMixin, DetailView):
     model = Recipe
+
     # template_name = 'shopping_lists/recipe.html'
 
     # def get_success_url(self):
@@ -262,3 +263,37 @@ class UserRecipeListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return self.request.user.recipes.all()
+
+
+class ProductInRecipeCreateView(UserHasAccessToFridgeMixin, CreateView):
+    model = ProductInRecipe
+    template_name = 'shopping_lists/space.html'
+
+    def get_success_url(self):
+        return reverse_lazy('recipe_detail', kwargs={'pk': self.kwargs['recipe_id'],
+                                                     'fridge_id': self.kwargs['fridge_id']})
+
+    def get_form(self):
+        return ProductInRecipeModelForm(recipe=Recipe.objects.get(pk=self.kwargs['recipe_id']),
+                                        **self.get_form_kwargs())
+
+
+class ProductInRecipeUpdateView(UserHasAccessToFridgeMixin, UpdateView):
+    model = ProductInRecipe
+    template_name = 'shopping_lists/space.html'
+
+    def get_success_url(self):
+        return reverse_lazy('recipe_detail', kwargs={'pk': self.object.recipe.pk,
+                                                     'fridge_id': self.kwargs['fridge_id']})
+
+    def get_form(self):
+        return ProductInRecipeModelForm(**self.get_form_kwargs())
+
+
+class ProductInRecipeDeleteView(UserHasAccessToFridgeMixin, DeleteView):
+    model = ProductInRecipe
+    template_name = 'delete_form.html'
+
+    def get_success_url(self):
+        return reverse_lazy('recipe_detail', kwargs={'pk': self.object.recipe.pk,
+                                                     'fridge_id': self.kwargs['fridge_id']})
