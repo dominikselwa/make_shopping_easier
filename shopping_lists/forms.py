@@ -96,6 +96,10 @@ class ProductInRecipeModelForm(forms.ModelForm):
     class Meta:
         model = ProductInRecipe
         fields = ('product', 'quantity_in_recipe')
+        labels = {
+            'product': 'Produkt:',
+            'quantity_in_recipe': 'Ile w przepisie?',
+        }
 
     def __init__(self, *args, **kwargs):
         self.recipe = kwargs.pop('recipe', None)
@@ -112,5 +116,5 @@ class ProductInRecipeModelForm(forms.ModelForm):
             self.instance.recipe = self.recipe
         return cleaned_data
 
-# na przyszłość
-# ProductInRecipeFormSet = formset_factory(ProductInRecipeModelForm)
+    # na przyszłość
+    # ProductInRecipeFormSet = formset_factory(ProductInRecipeModelForm)

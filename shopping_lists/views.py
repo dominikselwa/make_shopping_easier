@@ -233,7 +233,10 @@ class RecipeDetailView(UserHasAccessToFridgeMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({'object': Recipe.objects.get(pk=self.kwargs['pk'])})
+        context.update({'form': ProductInRecipeModelForm(recipe=self.object),
+                        'action': reverse_lazy('product_in_recipe_create',
+                                               kwargs={'pk': self.kwargs['pk'], 'fridge_id': self.kwargs['fridge_id']}
+                                               )})
         return context
 
 
