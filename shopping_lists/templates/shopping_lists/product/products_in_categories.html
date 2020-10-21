@@ -11,39 +11,49 @@
         {% if shopping_list %}
             {% if object_list|in_category:category %}
                 {% if category.has_products_in_shopping_list %}
-                    {% include 'product_card.html' %}
+                    {% include 'shopping_lists/product/product_card.html' %}
                 {% endif %}
             {% endif %}
         {% else %}
             {% if object_list|in_category:category %}
-                {% include 'product_card.html' %}
+                {% include 'shopping_lists/product/product_card.html' %}
             {% endif %}
         {% endif %}
     {% endfor %}
     {% if object.has_products_without_category %}
         {% if shopping_list %}
             {% if object.has_products_without_category_in_shopping_list %}
-                {% include 'product_card.html' with category=None %}
+                {% include 'shopping_lists/product/product_card.html' with category=None %}
             {% endif %}
         {% else %}
             {% if object.has_products_without_category_in_fridge %}
-                {% include 'product_card.html' with category=None %}
+                {% include 'shopping_lists/product/product_card.html' with category=None %}
             {% endif %}
         {% endif %}
     {% endif %}
+<div class="card text-center">
+<div class="card-body">
     {% if shopping_list %}
         {% if shop %}
             {% if shop.get_products.count is not 0 %}
-                <input class="btn btn-success" type="submit" value="Kupione!">
+                <input class="btn btn-success" type="submit" value="Kupione!" id="add_products">
+                {% else %}
+                Nie masz żadnych produktów na tej liście
             {% endif %}
         {% else %}
             {% if object.has_products_in_shopping_list %}
-                <input class="btn btn-success" type="submit" value="Kupione!">
+                <input class="btn btn-success" type="submit" value="Kupione!" id="add_products">
+                                {% else %}
+                Nie masz żadnych produktów na tej liście
             {% endif %}
         {% endif %}
     {% else %}
         {% if object.has_products_in_fridge %}
-            <input class="btn btn-success" type="submit" value="Wpisz na listę zakupów!">
+            <input class="btn btn-success" type="submit" value="Wpisz na listę zakupów!" id="add_products">
+                            {% else %}
+                Nie masz żadnych produktów w lodówce
         {% endif %}
     {% endif %}
+</div>
+</div>
 </form>

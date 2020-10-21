@@ -12,7 +12,13 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-xl">
-        <a class="navbar-brand" href="{% url 'main' %}">Make Shopping Easier</a>
+        <a class="navbar-brand" href="
+            {% if user.is_authenticated %}
+                {% url 'main' %}
+            {% else %}
+                {% url 'index' %}
+            {% endif %}
+">Make Shopping Easier</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -52,8 +58,15 @@
             </ul>
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'logout' %}">Wyloguj</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{ user }}
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{% url 'password_change' %}">Zmień hasło</a>
+                            <a class="dropdown-item" href="{% url 'logout' %}">Wyloguj</a>
+                        </div>
                     </li>
                 {% else %}
                     <li class="nav-item active">
@@ -75,8 +88,8 @@
                 Stwórz nowe konto lub zaloguj się, jeśli już je posiadasz.
             </div>
             <div class="card-body mx-auto">
-                <a class="btn btn-outline-success btn-sm" href="{% url 'signup' %}">Stwórz konto</a>
-                <a class="btn btn-outline-success btn-sm" href="{% url 'login' %}">Zaloguj</a>
+                <a class="btn btn-outline-success" href="{% url 'signup' %}">Stwórz konto</a>
+                <a class="btn btn-outline-success" href="{% url 'login' %}">Zaloguj</a>
             </div>
         </div>
     {% endblock %}

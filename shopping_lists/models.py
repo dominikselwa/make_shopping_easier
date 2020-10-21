@@ -75,6 +75,12 @@ class Category(models.Model):
     def get_delete_name(self):
         return f'kategorię "{self.name}"'
 
+    def get_update_url(self):
+        return reverse('category_update', kwargs={'pk': self.pk, 'fridge_id': self.fridge.id})
+
+    def get_delete_url(self):
+        return reverse('category_delete', kwargs={'pk': self.id, 'fridge_id': self.fridge.id})
+
 
 class Shop(models.Model):
     name = models.CharField(max_length=32)
@@ -102,6 +108,12 @@ class Shop(models.Model):
     def get_delete_name(self):
         return f'sklep "{self.name}"'
 
+    def get_update_url(self):
+        return reverse('shop_update', kwargs={'pk': self.pk, 'fridge_id': self.fridge.id})
+
+    def get_delete_url(self):
+        return reverse('shop_delete', kwargs={'pk': self.id, 'fridge_id': self.fridge.id})
+
 
 class Product(models.Model):
     name = models.CharField(max_length=64)
@@ -118,14 +130,13 @@ class Product(models.Model):
         unique_together = ('name', 'fridge')
 
     def __str__(self):
-        quantity_str = ''
-        if self.quantity is not None:
-            if self.quantity.is_integer():
-                quantity_str += f' {int(self.quantity)}'
-            else:
-                quantity_str += f' {self.quantity}'
-        quantity_str += f' {self.unit}'
-        return f'{self.name}:{quantity_str}' if len(quantity_str) > 1 else self.name
+        return self.name if self.unit is '' else f'{self.name}, jednostka: {self.unit}'
+
+    def get_quantity(self):
+        if self.quantity is None:
+            return None
+        readable_quantity = int(self.quantity) if self.quantity.is_integer() else self.quantity
+        return readable_quantity if self.unit is None else f'{readable_quantity} {self.unit}'
 
     def get_unique_error(self):
         return 'Nie można dodać kolejnego produktu o takiej nazwie'
@@ -183,12 +194,21 @@ class ProductInRecipe(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='recipes')
     quantity_in_recipe = models.FloatField(null=True, default=None)
 
+    # def __str__(self):
+    #     if self.quantity_in_recipe is None:
+    #         return self.product.name
+    #     else:
+    #         return_str = f'{self.product.name}: {self.quantity_in_recipe}'
+    #         return return_str if self.product.unit == '' else return_str + f' {self.product.unit}'
+
     def __str__(self):
+        return self.product.name
+
+    def get_quantity(self):
         if self.quantity_in_recipe is None:
-            return self.product.name
-        else:
-            return_str = f'{self.product.name}: {self.quantity_in_recipe}'
-            return return_str if self.product.unit == '' else return_str + f' {self.product.unit}'
+            return None
+        readable_quantity = int(self.quantity_in_recipe) if self.quantity_in_recipe.is_integer() else self.quantity_in_recipe
+        return readable_quantity if self.product.unit is None else f'{readable_quantity} {self.product.unit}'
 
     def get_update_url(self):
         return reverse('product_in_recipe_update', kwargs={'pk': self.pk, 'fridge_id': self.recipe.fridge.id})

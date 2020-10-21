@@ -12,11 +12,11 @@
 </ul>
 <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade show active" id="all-list" role="tabpanel" aria-labelledby="profile-tab">
-        {% include 'products_in_categories.html' with object_list=object.get_products_in_shopping_list %}
+        {% include 'shopping_lists/product/products_in_categories.html' with object_list=object.get_products_in_shopping_list %}
     </div>
     {% for shop in object.shops.all %}
         <div class="tab-pane fade" id="{{ shop }}" role="tabpanel" aria-labelledby="contact-tab">
-            {% include 'products_in_categories.html' with object_list=shop.get_products %}
+            {% include 'shopping_lists/product/products_in_categories.html' with object_list=shop.get_products %}
         </div>
     {% endfor %}
 </div>

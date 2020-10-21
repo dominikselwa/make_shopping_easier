@@ -1,0 +1,18 @@
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" id="category-list-tab" data-toggle="tab" href="#category-list" role="tab"
+           aria-controls="category-list" aria-selected="false">Wszytkie kategorie</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="create-category-tab" data-toggle="tab" href="#create-category" role="tab"
+           aria-controls="create-category" aria-selected="false">Dodaj kategorię</a>
+    </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="category-list" role="tabpanel" aria-labelledby="category-tab">
+        {% include 'object_list.html' with object_list=object.categories.all %}
+    </div>
+    <div class="tab-pane fade" id="create-category" role="tabpanel" aria-labelledby="create-category-tab">
+        {% include 'form_without_card.html' %}
+    </div>
+</div>

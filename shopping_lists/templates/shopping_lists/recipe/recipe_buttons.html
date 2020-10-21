@@ -1,8 +1,9 @@
 <div class="d-flex justify-content-between">
     <a href="{{ object.get_detail_url }}">{{ object }}</a>
     <div>
-        <a class="btn btn-success btn-sm" href="{{ object.get_add_to_shopping_list_url }}">Dodaj do listy zakupów</a>
-        <a class="btn btn-primary btn-sm" href="{{ object.get_update_url }}">Edytuj</a>
-        <a class="btn btn-danger btn-sm" href="{{ object.get_delete_url }}">Usuń</a>
+        <a class="btn btn-outline-success btn-sm" href="{{ object.get_add_to_shopping_list_url }}">Dodaj do listy zakupów</a>
+        <a class="btn btn-outline-warning btn-sm" href="{{ object.get_detail_url }}">Szczegóły</a>
+        <a class="btn btn-outline-primary btn-sm" href="{{ object.get_update_url }}">Zmień nazwę</a>
+        <a class="btn btn-outline-danger btn-sm" href="{{ object.get_delete_url }}">Usuń</a>
     </div>
 </div>

@@ -5,9 +5,14 @@
 {% endblock %}
 
 {% block header %}
+    <div class="d-flex justify-content-between">
     {{ object }}
+        <div>
+    <a class="btn btn-outline-success btn-sm" href="{% url 'fridge_detail' pk=object.fridge.pk %}">Przejdź do lodówki</a>
+        </div>
+    </div>
 {% endblock %}
 {% block body %}
-    {% include 'object_list.html' with object_list=object.productinrecipe_set.all %}
+    {% include 'shopping_lists/productinrecipe_list.html' with object_list=object.productinrecipe_set.all %}
     {% include 'form_without_card.html' %}
 {% endblock %}

@@ -7,15 +7,15 @@
 {% block content %}
     <div class="{% include 'card_classes.html' %}" style="width: 18rem">
         <div class="card-header text-center">
-            Napewno chcesz usunąć {{ object.get_delete_name }}?
+            Na pewno chcesz usunąć {{ object.get_delete_name }}?
         </div>
         <div class="card-body">
             <form method="post" class>
                 {% csrf_token %}
                 {{ form.as_p }}
                 <div class="text-center">
-                    <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-success">Cofnij</a>
-                    <button type="submit" class="btn btn-danger">Usuń</button>
+                    <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-outline-success">Cofnij</a>
+                    <button type="submit" class="btn btn-outline-danger">Usuń</button>
                 </div>
             </form>
         </div>

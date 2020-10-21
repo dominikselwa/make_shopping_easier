@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="{% include 'card_classes.html' %}">
+        <div class="card-header">
+            {% block header %}
+            {% endblock %}
+        </div>
+        {% block body %}
+        {% endblock %}
+    </div>
+{% endblock %}

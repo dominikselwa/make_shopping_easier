@@ -54,9 +54,9 @@ class ProductModelForm(FridgeUniqueModelForm):
         labels = {
             'name': 'Nazwa produktu:',
             'quantity': 'Ilość/Liczba produktów, które mają być widoczne na liście zakupów:',
-            'unit': 'Jednostka jakiej chcesz używać do tego produktu:',
+            'unit': 'Jednostka, jakiej chcesz używać do tego produktu:',
             'category': 'Kategoria, do której ma być przyporządkowany produkt:',
-            'shops': 'Sklepy w których będziesz kupować ten produkt:',
+            'shops': 'Sklepy, w których będziesz kupować ten produkt:',
             'is_in_shopping_list': 'Chcesz go dodać do listy zakupów?',
         }
         widgets = {

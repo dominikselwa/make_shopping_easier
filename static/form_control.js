@@ -4,8 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
     selects = document.querySelectorAll("select")
 
     for (let el of inputs) {
-        if (el.type)
-            el.classList.add('form-control')
+        if (el.type) {
+            if (!el.classList.contains('btn')) {
+                el.classList.add('form-control')
+            }
+        }
     }
 
     for (let el of selects) {

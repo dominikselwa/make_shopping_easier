@@ -1,0 +1,18 @@
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" id="shop-list-tab" data-toggle="tab" href="#shop-list" role="tab"
+           aria-controls="shop-list" aria-selected="false">Wszytkie sklepy</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="create-shop-tab" data-toggle="tab" href="#create-shop" role="tab"
+           aria-controls="create-shop" aria-selected="false">Dodaj sklep</a>
+    </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="shop-list" role="tabpanel" aria-labelledby="shop-tab">
+        {% include 'object_list.html' with object_list=object.shops.all %}
+    </div>
+    <div class="tab-pane fade" id="create-shop" role="tabpanel" aria-labelledby="create-shop-tab">
+        {% include 'form_without_card.html' %}
+    </div>
+</div>

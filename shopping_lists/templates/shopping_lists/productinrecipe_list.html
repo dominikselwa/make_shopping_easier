@@ -1,0 +1,18 @@
+<ul class="list-group list-group-flush">
+    {% for object in object_list %}
+        <li class="list-group-item">
+            <div class="d-flex justify-content-between">
+                <div>
+                    {{ object }}
+                    {% if object.get_quantity %}
+                        <span class="badge badge-pill badge-warning ml-2">{{ object.get_quantity }}</span>
+                    {% endif %}
+                </div>
+                <div>
+                    <a class="btn btn-outline-primary btn-sm" href="{{ object.get_update_url }}">Edytuj</a>
+                    <a class="btn btn-outline-danger btn-sm" href="{{ object.get_delete_url }}">Usuń</a>
+                </div>
+            </div>
+        </li>
+    {% endfor %}
+</ul>
