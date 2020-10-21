@@ -1,8 +1,10 @@
+from random import choice
 from secrets import token_urlsafe
 
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count
 from django.http import Http404
 from django.shortcuts import render, redirect
 
@@ -30,7 +32,12 @@ class SingUpView(CreateView):
 
 class MainView(LoginRequiredMixin, View):
     def get(self, request):
-        return render(request, 'shopping_lists/main.html')
+        if request.user.fridges.all().count() > 0:
+            return redirect(reverse_lazy('fridge_detail', kwargs={'pk': request.user.fridges.all().
+                                         annotate(num_products=Count('products')).
+                                         order_by('-num_products').first().pk}))
+        else:
+            return redirect(reverse_lazy('fridge_create'))
 
 
 class FridgeListView(LoginRequiredMixin, ListView):
@@ -43,7 +50,6 @@ class FridgeListView(LoginRequiredMixin, ListView):
 class FridgeCreateView(LoginRequiredMixin, CreateView):
     model = Fridge
     form_class = FridgeModelForm
-    template_name = 'shopping_lists/space.html'
 
     def form_valid(self, form):
         self.object = form.save()
@@ -58,7 +64,6 @@ class FridgeCreateView(LoginRequiredMixin, CreateView):
 class FridgeUpdateView(UserHasAccessToFridgeMixin, UpdateView):
     model = Fridge
     form_class = FridgeModelForm
-    template_name = 'shopping_lists/space.html'
 
     def get_success_url(self):
         return reverse_lazy('fridge_detail', kwargs={'pk': self.object.pk})
@@ -94,7 +99,6 @@ class FridgeDetailView(UserHasAccessToFridgeMixin, DetailView):
 
 class CategoryCreateView(UserHasAccessToFridgeMixin, CreateView):
     model = Category
-    template_name = 'shopping_lists/space.html'
 
     def get_success_url(self):
         return reverse_lazy('fridge_detail', kwargs={'pk': self.kwargs['pk']})
@@ -106,7 +110,6 @@ class CategoryCreateView(UserHasAccessToFridgeMixin, CreateView):
 
 class CategoryUpdateView(UserHasAccessToFridgeMixin, UpdateView):
     model = Category
-    template_name = 'shopping_lists/space.html'
 
     def get_success_url(self):
         return reverse_lazy('fridge_detail', kwargs={'pk': self.kwargs['fridge_id']})
@@ -126,7 +129,6 @@ class CategoryDeleteView(UserHasAccessToFridgeMixin, DeleteView):
 
 class ShopCreateView(UserHasAccessToFridgeMixin, CreateView):
     model = Shop
-    template_name = 'shopping_lists/space.html'
 
     def get_success_url(self):
         return reverse_lazy('fridge_detail', kwargs={'pk': self.kwargs['pk']})
@@ -138,7 +140,6 @@ class ShopCreateView(UserHasAccessToFridgeMixin, CreateView):
 
 class ShopUpdateView(UserHasAccessToFridgeMixin, UpdateView):
     model = Shop
-    template_name = 'shopping_lists/space.html'
 
     def get_success_url(self):
         return reverse_lazy('fridge_detail', kwargs={'pk': self.kwargs['fridge_id']})
@@ -158,7 +159,6 @@ class ShopDeleteView(UserHasAccessToFridgeMixin, DeleteView):
 
 class ProductCreateView(UserHasAccessToFridgeMixin, CreateView):
     model = Product
-    template_name = 'shopping_lists/product.html'
 
     def get_success_url(self):
         return reverse_lazy('fridge_detail', kwargs={'pk': self.kwargs['pk']})
@@ -170,7 +170,6 @@ class ProductCreateView(UserHasAccessToFridgeMixin, CreateView):
 
 class ProductUpdateView(UserHasAccessToFridgeMixin, UpdateView):
     model = Product
-    template_name = 'shopping_lists/product.html'
 
     def get_success_url(self):
         return reverse_lazy('fridge_detail', kwargs={'pk': self.kwargs['fridge_id']})
@@ -212,7 +211,6 @@ class ProductsToShoppingList(UserHasAccessToFridgeMixin, View):
 
 class RecipeCreateView(UserHasAccessToFridgeMixin, CreateView):
     model = Recipe
-    template_name = 'shopping_lists/space.html'
 
     def get_success_url(self):
         return reverse_lazy('recipe_detail', kwargs={'pk': self.object.id, 'fridge_id': self.kwargs['pk']})
@@ -237,7 +235,6 @@ class RecipeDetailView(UserHasAccessToFridgeMixin, DetailView):
 
 class RecipeUpdateView(UserHasAccessToFridgeMixin, UpdateView):
     model = Recipe
-    template_name = 'shopping_lists/space.html'
 
     def get_success_url(self):
         return reverse_lazy('recipe_detail', kwargs={'pk': self.object.id, 'fridge_id': self.object.fridge.id})
@@ -265,7 +262,6 @@ class UserRecipeListView(LoginRequiredMixin, ListView):
 
 class ProductInRecipeCreateView(UserHasAccessToFridgeMixin, CreateView):
     model = ProductInRecipe
-    template_name = 'shopping_lists/space.html'
 
     def get_success_url(self):
         return reverse_lazy('recipe_detail', kwargs={'pk': self.kwargs['pk'],
@@ -278,7 +274,6 @@ class ProductInRecipeCreateView(UserHasAccessToFridgeMixin, CreateView):
 
 class ProductInRecipeUpdateView(UserHasAccessToFridgeMixin, UpdateView):
     model = ProductInRecipe
-    template_name = 'shopping_lists/space.html'
 
     def get_success_url(self):
         return reverse_lazy('recipe_detail', kwargs={'pk': self.object.recipe.pk,

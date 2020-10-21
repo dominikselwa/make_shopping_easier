@@ -12,7 +12,7 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-xl">
-        <a class="navbar-brand" href="/">Make Shopping Easier</a>
+        <a class="navbar-brand" href="{% url 'main' %}">Make Shopping Easier</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -22,7 +22,8 @@
                 {% if user.is_authenticated %}
                     {% if user.fridges %}
                         {% if user.fridges.all.count is 0 %}
-                        {% elif user.fridges.all.count is not 1 %}
+                            {#                        {% elif user.fridges.all.count is not 1 %}#}
+                        {% else %}
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -36,11 +37,6 @@
                                     {% endfor %}
                                 </div>
                             </li>
-                        {% else %}
-                            <li class="nav-item active">
-                                <a class="nav-link"
-                                   href="{{ user.fridges.first.get_detail_url }}">{{ user.fridges.first }}</a>
-                            </li>
                         {% endif %}
                     {% endif %}
                     </li>
@@ -48,10 +44,10 @@
                         <a class="nav-link" href="{% url 'fridge_create' %}">Nowa lodówka</a>
                     </li>
                     {% if user.recipes.all.count is not 0 %}
-                                            <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'recipe_list' %}">Moje przepisy</a>
-                    </li>
-                        {% endif %}
+                        <li class="nav-item active">
+                            <a class="nav-link" href="{% url 'recipe_list' %}">Moje przepisy</a>
+                        </li>
+                    {% endif %}
                 {% endif %}
             </ul>
             <ul class="navbar-nav">
@@ -61,10 +57,10 @@
                     </li>
                 {% else %}
                     <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'login' %}">Zaloguj</a>
+                        <a class="nav-link" href="{% url 'signup' %}">Stwórz konto</a>
                     </li>
                     <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'signup' %}">Zapisz się</a>
+                        <a class="nav-link" href="{% url 'login' %}">Zaloguj</a>
                     </li>
                 {% endif %}
             </ul>
@@ -73,7 +69,16 @@
 </nav>
 <div class="container-xl content">
     {% block content %}
-        Witaj w najlepszej aplikacji do łatwego tworzenia list na zakupy
+        <div class="{% include 'card_classes.html' %}" style="max-width: 33rem">
+            <div class="card-header text-center">
+                Witaj w aplikacji do łatwego tworzenia i monitorowania Twojej listy zakupów.
+                Stwórz nowe konto lub zaloguj się, jeśli już je posiadasz.
+            </div>
+            <div class="card-body mx-auto">
+                <a class="btn btn-outline-success btn-sm" href="{% url 'signup' %}">Stwórz konto</a>
+                <a class="btn btn-outline-success btn-sm" href="{% url 'login' %}">Zaloguj</a>
+            </div>
+        </div>
     {% endblock %}
 </div>
 

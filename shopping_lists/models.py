@@ -46,6 +46,9 @@ class Fridge(models.Model):
     def has_products_in_shopping_list(self):
         return self.get_products_in_shopping_list().count() != 0
 
+    def get_delete_name(self):
+        return f'lodówkę "{self.name}"'
+
 
 class Category(models.Model):
     name = models.CharField(max_length=32)
@@ -68,6 +71,9 @@ class Category(models.Model):
 
     def has_products_in_shopping_list(self):
         return self.fridge.products.filter(category=self, is_in_shopping_list=True).count() != 0
+
+    def get_delete_name(self):
+        return f'kategorię "{self.name}"'
 
 
 class Shop(models.Model):
@@ -92,6 +98,9 @@ class Shop(models.Model):
 
     def has_products_in_shopping_list(self):
         return self.products.filter(is_in_shopping_list=True).count() != 0
+
+    def get_delete_name(self):
+        return f'sklep "{self.name}"'
 
 
 class Product(models.Model):
@@ -130,6 +139,9 @@ class Product(models.Model):
     def get_delete_url(self):
         return reverse('product_delete', kwargs={'pk': self.id, 'fridge_id': self.fridge.id})
 
+    def get_delete_name(self):
+        return f'produkt "{self.name}"'
+
 
 class Recipe(models.Model):
     name = models.CharField(max_length=64)
@@ -162,6 +174,9 @@ class Recipe(models.Model):
     def get_add_to_shopping_list_url(self):
         return reverse('add_recipe_to_shopping_list', kwargs={'pk': self.id, 'fridge_id': self.fridge.id})
 
+    def get_delete_name(self):
+        return f'przepis "{self.name}"'
+
 
 class ProductInRecipe(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
@@ -180,6 +195,9 @@ class ProductInRecipe(models.Model):
 
     def get_delete_url(self):
         return reverse('product_in_recipe_delete', kwargs={'pk': self.id, 'fridge_id': self.recipe.fridge.id})
+
+    def get_delete_name(self):
+        return f'"{self.product.name}" z przepisu "{self.recipe.name}"'
 
 
 class Invitation(models.Model):

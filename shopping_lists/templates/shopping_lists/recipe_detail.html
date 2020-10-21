@@ -1,13 +1,13 @@
-{% extends 'base.html' %}
+{% extends 'card_40rem.html' %}
 
 {% block title %}
-    {{ object}}
+    {{ object }}
 {% endblock %}
 
-{% block content %}
-    <div class="card mx-auto mt-5 mb-5">
-    <div class="card-header">{{ object }}</div>
-        {% include 'object_list.html' with object_list=object.productinrecipe_set.all %}
-        {% include 'form.html' %}
-    </div>
+{% block header %}
+    {{ object }}
+{% endblock %}
+{% block body %}
+    {% include 'object_list.html' with object_list=object.productinrecipe_set.all %}
+    {% include 'form_without_card.html' %}
 {% endblock %}

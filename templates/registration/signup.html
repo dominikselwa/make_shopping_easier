@@ -5,7 +5,5 @@
 {% endblock %}
 
 {% block content %}
-    <div class="card mx-auto mt-5 mb-5" style="width: 40rem">
-        {% include 'form.html' with button_name='Stwórz konto' %}
-    </div>
+    {% include 'form.html' with button_name='Stwórz konto' max_width='40rem'%}
 {% endblock %}

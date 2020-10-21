@@ -1,14 +1,12 @@
-{% extends 'base.html' %}
+{% extends 'card_40rem.html' %}
 
 {% block title %}
-    Twoje lodówki
+    Twoje przepisy
 {% endblock %}
 
-{% block content %}
-    <div class="card mx-auto mt-5 mb-5" style="width: 36rem">
-        <div class="card-header d-flex justify-content-between">
-            <h5>Twoje przepisy:</h5>
-        </div>
-        {% include 'shopping_lists/reciepes.html' %}
-    </div>
+{% block header %}
+    <h5>Twoje przepisy:</h5>
+{% endblock %}
+{% block body %}
+    {% include 'shopping_lists/recipe/reciepes.html' %}
 {% endblock %}

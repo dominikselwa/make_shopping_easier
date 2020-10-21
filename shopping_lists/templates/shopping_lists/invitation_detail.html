@@ -1,14 +1,12 @@
-{% extends 'base.html' %}
+{% extends 'card_40rem.html' %}
 
 {% block title %}
     Zaproszenie
 {% endblock %}
 
-{% block content %}
-    <div class="card mx-auto mt-5 mb-5" style="width: 40rem">
-        <div class="card-header">Zaproszenie</div>
-        <div class="card-body">
-            {% url 'invitation_accept' slug=object.slug %}
-        </div>
-    </div>
+{% block header %}
+    Zaproszenie
+{% endblock %}
+{% block body %}
+    <input class="form-control" disabled value="{% url 'invitation_accept' slug=object.slug %}">
 {% endblock %}

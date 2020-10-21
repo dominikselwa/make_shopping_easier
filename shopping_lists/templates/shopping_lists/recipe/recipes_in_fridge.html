@@ -11,9 +11,9 @@
 </ul>
 <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade show active" id="recipe-list" role="tabpanel" aria-labelledby="profile-tab">
-        {% include 'shopping_lists/reciepes.html' with object_list=object.recipes.all %}
+        {% include 'shopping_lists/recipe/reciepes.html' with object_list=object.recipes.all %}
     </div>
     <div class="tab-pane fade" id="create-recipe" role="tabpanel" aria-labelledby="profile-tab">
-        {% include 'form.html' %}
+        {% include 'form_without_card.html' %}
     </div>
 </div>
