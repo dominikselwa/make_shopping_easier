@@ -21,6 +21,8 @@ from shopping_lists.models import Fridge, Category, Shop, Product, Recipe, Produ
 
 class IndexView(View):
     def get(self, request):
+        if request.user.is_authenticated:
+            return redirect('main')
         return render(request, 'base.html')
 
 
