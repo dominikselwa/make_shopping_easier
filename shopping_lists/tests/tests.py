@@ -288,7 +288,7 @@ def test_product_create_all_fields(client, set_up):
         'unit': 'new unit',
         'category': fridge.categories.first().pk,
         'shops': [shop.pk for shop in shops],
-        'is_in_shopping_list': False,
+        'place': 0,
     }
 
     response = client.post(reverse('product_create', kwargs={'pk': fridge.pk}), data, follow=True)
@@ -303,7 +303,7 @@ def test_product_create_all_fields(client, set_up):
 
 
 @pytest.mark.django_db
-def test_product_update(client, set_up):
+def test_product_update_min_fields(client, set_up):
     user = login(client, choice(set_up))
     fridge = user.fridges.first()
     product = fridge.products.first()
@@ -329,7 +329,7 @@ def test_product_update_all_fields(client, set_up):
         'unit': 'edited unit',
         'category': fridge.categories.first().pk,
         'shops': [shop.pk for shop in shops],
-        'is_in_shopping_list': False,
+        'place': 1,
     }
 
     response = client.post(reverse('product_update', kwargs={'pk': product.pk, 'fridge_id': fridge.id}),
@@ -363,7 +363,7 @@ def test_product_delete(client, set_up):
 def test_products_to_fridge(client, set_up):
     user = login(client, choice(set_up))
     fridge = user.fridges.first()
-    products = fridge.products.filter(is_in_shopping_list=True)
+    products = fridge.products.filter(place=0)
     products_in_shopping_list_before = products.count()
 
     response = client.post(reverse('products_to_fridge', kwargs={'pk': fridge.pk}),
@@ -371,14 +371,14 @@ def test_products_to_fridge(client, set_up):
                            follow=True)
 
     assert response.request['PATH_INFO'] == reverse('fridge_detail', kwargs={'pk': fridge.pk})
-    assert fridge.products.filter(is_in_shopping_list=True).count() == 0 != products_in_shopping_list_before
+    assert fridge.products.filter(place=0).count() == 0 != products_in_shopping_list_before
 
 
 @pytest.mark.django_db
 def test_products_to_shopping_fridge(client, set_up):
     user = login(client, choice(set_up))
     fridge = user.fridges.first()
-    products = fridge.products.filter(is_in_shopping_list=False)
+    products = fridge.products.filter(place=1)
     products_in_shopping_list_before = products.count()
 
     response = client.post(reverse('products_to_shopping_list', kwargs={'pk': fridge.pk}),
@@ -386,7 +386,7 @@ def test_products_to_shopping_fridge(client, set_up):
                            follow=True)
 
     assert response.request['PATH_INFO'] == reverse('fridge_detail', kwargs={'pk': fridge.pk})
-    assert fridge.products.filter(is_in_shopping_list=False).count() == 0 != products_in_shopping_list_before
+    assert fridge.products.filter(place=1).count() == 0 != products_in_shopping_list_before
 
 
 @pytest.mark.django_db
@@ -553,18 +553,18 @@ def test_product_in_recipe_delete(client, set_up):
 
 
 @pytest.mark.parametrize(
-    'is_in_shopping_list, product_quantity_before_adding, quantity_in_recipe, resulting_product_quantity',
-    ((True, None, None, None),
-     (True, 3, None, 3),
-     (True, None, 4, 4),
-     (True, 3, 4, 7),
-     (False, None, None, None),
-     (False, 3, None, 3),
-     (False, None, 4, 4),
-     (False, 3, 4, 4),
+    'place, product_quantity_before_adding, quantity_in_recipe, resulting_product_quantity',
+    ((0, None, None, None),
+     (0, 3, None, 3),
+     (0, None, 4, 4),
+     (0, 3, 4, 7),
+     (1, None, None, None),
+     (1, 3, None, 3),
+     (1, None, 4, 4),
+     (1, 3, 4, 4),
      ))
 @pytest.mark.django_db
-def test_add_recipe_to_shopping_list(client, set_up, is_in_shopping_list, product_quantity_before_adding,
+def test_add_recipe_to_shopping_list(client, set_up, place, product_quantity_before_adding,
                                      quantity_in_recipe, resulting_product_quantity):
     user = login(client, choice(set_up))
     recipe = user.recipes.first()
@@ -573,7 +573,7 @@ def test_add_recipe_to_shopping_list(client, set_up, is_in_shopping_list, produc
 
     recipe.productinrecipe_set.exclude(pk=product_in_recipe.pk).delete()
 
-    product.is_in_shopping_list = is_in_shopping_list
+    product.place = place
     product.quantity = product_quantity_before_adding
     product.save()
 

@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    inputs = document.querySelectorAll("input:not([type='checkbox'])")
+    inputs = document.querySelectorAll("input:not([type='checkbox']):not([type='radio'])")
     selects = document.querySelectorAll("select")
 
     for (let el of inputs) {
@@ -24,4 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    const formChecks = document.querySelectorAll("form > ul:not([id=''])")
+
+    for (let ul of formChecks) {
+        ul.classList.add('list-inline')
+        for (let li of ul.children) {
+            li.classList.add('list-inline-item')
+        }
+    }
 });

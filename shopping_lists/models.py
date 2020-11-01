@@ -26,10 +26,10 @@ class Fridge(models.Model):
         return reverse('fridge_delete', kwargs={'pk': self.id})
 
     def get_products_in_shopping_list(self):
-        return self.products.filter(is_in_shopping_list=True)
+        return self.products.filter(place=0)
 
     def get_products_in_fridge(self):
-        return self.products.filter(is_in_shopping_list=False)
+        return self.products.filter(place=1)
 
     def has_products_without_category(self):
         return self.products.filter(category=None).count() != 0
@@ -70,7 +70,7 @@ class Category(models.Model):
         return self.fridge.products.filter(category=self).count() != 0
 
     def has_products_in_shopping_list(self):
-        return self.fridge.products.filter(category=self, is_in_shopping_list=True).count() != 0
+        return self.fridge.products.filter(category=self, place=0).count() != 0
 
     def get_delete_name(self):
         return f'kategorię "{self.name}"'
@@ -99,11 +99,11 @@ class Shop(models.Model):
         return reverse('shop_create', kwargs={'pk': self.fridge.pk})
 
     def get_products(self):
-        return Product.objects.filter(fridge=self.fridge, is_in_shopping_list=True).filter(
+        return Product.objects.filter(fridge=self.fridge, place=0).filter(
             models.Q(shops=self) | models.Q(shops=None))
 
     def has_products_in_shopping_list(self):
-        return self.products.filter(is_in_shopping_list=True).count() != 0
+        return self.products.filter(place=0).count() != 0
 
     def get_delete_name(self):
         return f'sklep "{self.name}"'
@@ -116,12 +116,18 @@ class Shop(models.Model):
 
 
 class Product(models.Model):
+    PLACES = (
+        (0, 'Lista zakupów'),
+        (1, 'Lodówka'),
+        (2, 'Przechowalnia'),
+    )
+
     name = models.CharField(max_length=64)
     fridge = models.ForeignKey(Fridge, on_delete=models.CASCADE, related_name='products')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, related_name='products', null=True)
     avg_time_between_purchases = models.IntegerField(null=True, default=None)
     last_bought = models.DateTimeField(null=True, default=None)
-    is_in_shopping_list = models.BooleanField(default=True)
+    place = models.IntegerField(choices=PLACES, default=2)
     unit = models.CharField(max_length=16, default='')
     quantity = models.FloatField(null=True, default=None)
     shops = models.ManyToManyField(Shop, related_name='products')
@@ -130,7 +136,7 @@ class Product(models.Model):
         unique_together = ('name', 'fridge')
 
     def __str__(self):
-        return self.name if self.unit is '' else f'{self.name}, jednostka: {self.unit}'
+        return self.name if self.unit == '' else f'{self.name}, jednostka: {self.unit}'
 
     def get_quantity(self):
         if self.quantity is None:
@@ -207,7 +213,8 @@ class ProductInRecipe(models.Model):
     def get_quantity(self):
         if self.quantity_in_recipe is None:
             return None
-        readable_quantity = int(self.quantity_in_recipe) if self.quantity_in_recipe.is_integer() else self.quantity_in_recipe
+        readable_quantity = int(
+            self.quantity_in_recipe) if self.quantity_in_recipe.is_integer() else self.quantity_in_recipe
         return readable_quantity if self.product.unit is None else f'{readable_quantity} {self.product.unit}'
 
     def get_update_url(self):

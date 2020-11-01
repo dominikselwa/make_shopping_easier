@@ -36,11 +36,11 @@ def set_up():
 
                 Invitation.objects.create(slug=unique_slug, fridge=fridge)
 
-            for k in range(5):
+            for k in range(6):
                 product = Product.objects.create(name=k * 100,
                                                  fridge=fridge,
                                                  category=choice(fridge.categories.all()),
-                                                 is_in_shopping_list=k % 2 == 0,
+                                                 place=k % 3 == 0,
                                                  )
                 product.shops.set(fridge.shops.all()[:randint(1, 2)])
 

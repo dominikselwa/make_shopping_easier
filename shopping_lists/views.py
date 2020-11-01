@@ -195,7 +195,7 @@ class ProductsToFridge(UserHasAccessToFridgeMixin, View):
         if product_ids:
             products = Product.objects.filter(id__in=product_ids)
             for product in products:
-                product.is_in_shopping_list = False
+                product.place = 1
                 product.save()
         return redirect(reverse_lazy('fridge_detail', kwargs={'pk': pk}))
 
@@ -206,7 +206,7 @@ class ProductsToShoppingList(UserHasAccessToFridgeMixin, View):
         if product_ids:
             products = Product.objects.filter(id__in=product_ids)
             for product in products:
-                product.is_in_shopping_list = True
+                product.place = 0
                 product.save()
         return redirect(reverse_lazy('fridge_detail', kwargs={'pk': pk}))
 
@@ -299,14 +299,14 @@ class AddRecipeToShoppingListView(UserHasAccessToFridgeMixin, View):
         recipe = Recipe.objects.get(pk=pk)
         for product_in_recipe in recipe.productinrecipe_set.all():
             product = product_in_recipe.product
-            if product.is_in_shopping_list:
+            if product.place == 0:
                 if product_in_recipe.quantity_in_recipe is not None:
                     if product.quantity is None:
                         product.quantity = product_in_recipe.quantity_in_recipe
                     else:
                         product.quantity += product_in_recipe.quantity_in_recipe
             else:
-                product.is_in_shopping_list = True
+                product.place = 0
                 if product_in_recipe.quantity_in_recipe is not None:
                     product.quantity = product_in_recipe.quantity_in_recipe
 

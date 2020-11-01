@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 from make_shopping_easier.local_settings import DATABASES, SECRET_KEY
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Build paths inside the project like this: BASE_DIR / 'subdir'.her
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 

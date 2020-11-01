@@ -50,17 +50,18 @@ class ShopModelForm(FridgeUniqueModelForm):
 class ProductModelForm(FridgeUniqueModelForm):
     class Meta:
         model = Product
-        fields = ('name', 'quantity', 'unit', 'category', 'shops', 'is_in_shopping_list')
+        fields = ('name', 'quantity', 'unit', 'category', 'shops', 'place')
         labels = {
             'name': 'Nazwa produktu:',
             'quantity': 'Ilość/Liczba produktów, które mają być widoczne na liście zakupów:',
             'unit': 'Jednostka, jakiej chcesz używać do tego produktu:',
             'category': 'Kategoria, do której ma być przyporządkowany produkt:',
             'shops': 'Sklepy, w których będziesz kupować ten produkt:',
-            'is_in_shopping_list': 'Chcesz go dodać do listy zakupów?',
+            'place': 'Gdzie chcesz go dodać?',
         }
         widgets = {
             'shops': forms.CheckboxSelectMultiple(),
+            'place': forms.RadioSelect(),
         }
 
     def __init__(self, *args, **kwargs):
@@ -71,6 +72,7 @@ class ProductModelForm(FridgeUniqueModelForm):
         self.fields['unit'].required = False
         self.fields['quantity'].required = False
         self.fields['shops'].required = False
+        self.fields['place'].required = False
         self.fields['quantity'].widget.attrs['min'] = 0
 
 
